@@ -6,120 +6,54 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Fireside Follies 🔥</title>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
-  body { background:#0a0603; font-family:'Georgia', serif; overflow:hidden; width:100vw; height:100vh; }
-
-#gameCanvas { display:block; touch-action:none; }
-
-/* ── UI Overlays ── */
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
+body { background:#000; font-family:'Georgia',serif; overflow:hidden; width:100vw; height:100vh; }
+#gameCanvas { display:block; touch-action:none; position:fixed; inset:0; }
 .screen { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:20; }
 .screen.hidden { display:none; }
-
-/* Title screen */
-#titleScreen { background:radial-gradient(ellipse at 50% 80%, #7a2a00 0%, #1a0800 60%, #000 100%); }
-#titleScreen h1 {
-font-size:clamp(2.2rem,8vw,4rem); color:#ffcc66;
-text-shadow:0 0 30px #ff6600, 0 0 60px #ff3300;
-letter-spacing:2px; text-align:center; margin-bottom:8px;
-}
-#titleScreen .sub { color:#ffaa44; font-size:clamp(0.9rem,3vw,1.2rem); margin-bottom:40px; text-align:center; }
-.fire-btn {
-background:linear-gradient(135deg,#cc3300,#ff6600,#ffaa00);
-border:none; border-radius:50px; padding:14px 36px;
-font-size:clamp(1rem,4vw,1.3rem); font-family:‘Georgia’,serif;
-color:#fff; font-weight:bold; cursor:pointer; margin:8px;
-box-shadow:0 4px 20px #ff660088; transition:transform 0.1s,box-shadow 0.1s;
-}
-.fire-btn:active { transform:scale(0.95); box-shadow:0 2px 10px #ff660088; }
-.fire-btn.secondary { background:linear-gradient(135deg,#333,#555); box-shadow:0 4px 20px #00000088; }
-
-/* Lobby */
-#lobbyScreen { background:radial-gradient(ellipse at 50% 80%,#5a1e00,#100500 70%,#000 100%); }
-#lobbyScreen h2 { color:#ffcc66; font-size:clamp(1.5rem,6vw,2.5rem); margin-bottom:20px; text-shadow:0 0 20px #ff6600; }
-.lobby-box { background:#ffffff11; border:1px solid #ff660033; border-radius:16px; padding:20px; width:min(90vw,380px); }
-.lobby-box input {
-width:100%; background:#ffffff18; border:1px solid #ff6600; border-radius:8px;
-padding:10px 14px; font-size:1.1rem; color:#fff; margin:8px 0; font-family:‘Georgia’,serif;
-}
-.lobby-box input::placeholder { color:#ff660066; }
-.code-display { font-size:2.5rem; color:#ffcc66; text-align:center; letter-spacing:8px;
-text-shadow:0 0 20px #ff6600; margin:12px 0; font-weight:bold; }
+#titleScreen { background:radial-gradient(ellipse at 50% 85%,#8a3000 0%,#1a0800 55%,#000 100%); }
+#titleScreen h1 { font-size:clamp(2.4rem,9vw,4.5rem); color:#ffcc66; text-shadow:0 0 40px #ff6600,0 0 80px #ff3300; letter-spacing:3px; text-align:center; margin-bottom:6px; }
+#titleScreen .sub { color:#ffaa44; font-size:clamp(0.85rem,2.5vw,1.1rem); margin-bottom:36px; text-align:center; opacity:0.85; }
+.fire-btn { background:linear-gradient(135deg,#cc3300,#ff6600,#ffaa00); border:none; border-radius:50px; padding:13px 34px; font-size:clamp(0.95rem,3.5vw,1.25rem); font-family:'Georgia',serif; color:#fff; font-weight:bold; cursor:pointer; margin:7px; box-shadow:0 4px 20px #ff660066; transition:transform 0.1s; }
+.fire-btn:active { transform:scale(0.95); }
+.fire-btn.secondary { background:linear-gradient(135deg,#2a2a2a,#444); box-shadow:0 4px 20px #00000066; }
+#lobbyScreen { background:radial-gradient(ellipse at 50% 85%,#5a1e00,#0e0400 65%,#000 100%); }
+#lobbyScreen h2 { color:#ffcc66; font-size:clamp(1.4rem,5vw,2.2rem); margin-bottom:18px; text-shadow:0 0 20px #ff6600; }
+.lobby-box { background:#ffffff0e; border:1px solid #ff660044; border-radius:18px; padding:20px; width:min(92vw,370px); }
+.lobby-box input { width:100%; background:#ffffff15; border:1px solid #ff6600; border-radius:8px; padding:10px 14px; font-size:1.05rem; color:#fff; margin:7px 0; font-family:'Georgia',serif; outline:none; }
+.lobby-box input::placeholder { color:#ff660055; }
+.code-display { font-size:2.8rem; color:#ffcc66; text-align:center; letter-spacing:10px; text-shadow:0 0 24px #ff6600; margin:14px 0; font-weight:bold; }
 .players-list { margin:10px 0; }
-.player-slot { display:flex; align-items:center; gap:8px; padding:6px; border-radius:8px;
-margin:4px 0; background:#ffffff0a; color:#ffcc99; font-size:0.95rem; }
-.player-dot { width:10px; height:10px; border-radius:50%; background:#44ff44; }
-.player-dot.empty { background:#ff444422; border:1px solid #ff4444; }
-#lobbyStatus { color:#ff9944; font-size:0.85rem; text-align:center; margin:8px 0; }
-
-/* HUD */
-#hud { position:fixed; top:0; left:0; right:0; z-index:10; pointer-events:none; }
-#hudBar {
-display:flex; justify-content:space-between; align-items:center;
-padding:8px 12px; background:linear-gradient(180deg,#00000088,transparent);
-}
-#pointsDisplay { color:#ffcc66; font-size:1rem; text-shadow:0 0 10px #ff6600; }
-#commentaryBox {
-position:fixed; bottom:0; left:0; right:0; z-index:15; pointer-events:none;
-padding:8px 16px; min-height:44px;
-background:linear-gradient(0deg,#00000099,transparent);
-color:#ffeecc; font-size:clamp(0.75rem,3vw,0.95rem);
-text-align:center; font-style:italic;
-text-shadow:1px 1px 4px #000;
-}
-
-/* Shop */
-#shopScreen { background:#00000099; backdrop-filter:blur(4px); }
-#shopScreen .shop-box {
-background:#1a0a00ee; border:1px solid #ff6600; border-radius:20px;
-padding:20px; width:min(95vw,420px); max-height:80vh; overflow-y:auto;
-}
-#shopScreen h2 { color:#ffcc66; font-size:1.6rem; text-align:center; margin-bottom:14px; text-shadow:0 0 15px #ff6600; }
-.shop-category { color:#ff9944; font-size:0.85rem; text-transform:uppercase; letter-spacing:2px; margin:12px 0 6px; }
-.shop-item {
-display:flex; align-items:center; justify-content:space-between;
-padding:10px; border-radius:10px; background:#ffffff0a;
-margin:4px 0; border:1px solid #ff660022;
-}
-.shop-item-info { display:flex; align-items:center; gap:10px; color:#ffeecc; font-size:0.9rem; }
-.shop-item-icon { font-size:1.5rem; }
-.shop-item-cost { color:#ffcc66; font-size:0.85rem; }
-.buy-btn {
-background:#cc4400; border:none; border-radius:8px; padding:6px 14px;
-color:#fff; font-size:0.8rem; cursor:pointer; pointer-events:all;
-}
-.buy-btn:disabled { background:#333; color:#666; }
-.buy-btn.owned { background:#224400; color:#88ff88; }
-
-/* Cook result popup */
-#cookResult {
-position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) scale(0);
-z-index:30; background:#1a0800ee; border:2px solid #ff6600;
-border-radius:20px; padding:24px 32px; text-align:center;
-transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-max-width:80vw;
-}
-#cookResult.show { transform:translate(-50%,-50%) scale(1); }
-#cookResult .result-emoji { font-size:3rem; }
-#cookResult .result-level { font-size:1.4rem; color:#ffcc66; margin:8px 0; font-weight:bold; }
-#cookResult .result-comment { font-size:0.9rem; color:#ffeecc; font-style:italic; }
-#cookResult .result-points { font-size:1.1rem; color:#44ff88; margin-top:10px; }
-
-/* Throwable animation */
-.throwable-anim {
-position:fixed; font-size:2.5rem; pointer-events:none; z-index:25;
-animation:throwArc 1.2s ease-in forwards;
-}
-@keyframes throwArc {
-0%   { transform:translate(0,0) rotate(0deg) scale(1); opacity:1; }
-40%  { transform:translate(var(–tx),var(–ty)) rotate(180deg) scale(1.2); opacity:1; }
-100% { transform:translate(var(–tx2),var(–ty2)) rotate(360deg) scale(0.3); opacity:0; }
-}
+.player-slot { display:flex; align-items:center; gap:8px; padding:7px 10px; border-radius:8px; margin:3px 0; background:#ffffff08; color:#ffcc99; font-size:0.9rem; }
+.player-dot { width:9px; height:9px; border-radius:50%; background:#44ff44; flex-shrink:0; }
+.player-dot.empty { background:transparent; border:1px solid #ff444455; }
+#lobbyStatus { color:#ff9944; font-size:0.82rem; text-align:center; margin:8px 0; min-height:18px; }
+/* TOP HUD */
+#topHud { position:fixed; top:0; left:0; right:0; z-index:15; pointer-events:none; display:flex; align-items:stretch; min-height:46px; background:linear-gradient(180deg,#000000cc 0%,#00000077 65%,transparent 100%); }
+#topHud.hidden { display:none; }
+#commentaryStrip { flex:1; display:flex; align-items:center; padding:7px 14px; color:#ffeecc; font-size:clamp(0.7rem,2.6vw,0.9rem); font-style:italic; text-shadow:1px 1px 8px #000,0 0 20px #000; line-height:1.35; }
+#hudRight { display:flex; align-items:center; gap:6px; padding:6px 10px; pointer-events:all; flex-shrink:0; }
+#pointsBadge { color:#ffcc66; font-size:0.8rem; font-weight:bold; text-shadow:0 0 8px #ff6600; white-space:nowrap; }
+.hud-btn { background:#cc440099; border:1px solid #ff660088; border-radius:7px; padding:4px 10px; color:#ffcc66; font-size:0.75rem; cursor:pointer; white-space:nowrap; }
+/* SHOP */
+#shopScreen { background:#000000bb; backdrop-filter:blur(6px); }
+#shopScreen .shop-box { background:#160800f0; border:1px solid #ff660088; border-radius:20px; padding:18px; width:min(96vw,400px); max-height:85vh; overflow-y:auto; }
+#shopScreen h2 { color:#ffcc66; font-size:1.5rem; text-align:center; margin-bottom:10px; text-shadow:0 0 14px #ff6600; }
+.shop-pts { text-align:center; color:#ffaa44; font-size:0.88rem; margin-bottom:10px; }
+.shop-category { color:#ff9944; font-size:0.78rem; text-transform:uppercase; letter-spacing:2px; margin:12px 0 5px; border-bottom:1px solid #ff660022; padding-bottom:3px; }
+.shop-item { display:flex; align-items:center; justify-content:space-between; padding:8px 10px; border-radius:9px; background:#ffffff08; margin:3px 0; border:1px solid #ff660018; }
+.shop-item-info { display:flex; align-items:center; gap:9px; color:#ffeecc; font-size:0.85rem; }
+.shop-item-icon { font-size:1.4rem; line-height:1; }
+.shop-item-cost { color:#ffcc66; font-size:0.78rem; display:block; }
+.buy-btn { background:#cc4400; border:none; border-radius:7px; padding:5px 12px; color:#fff; font-size:0.76rem; cursor:pointer; pointer-events:all; flex-shrink:0; }
+.buy-btn:disabled { background:#2a2a2a; color:#555; cursor:default; }
+.buy-btn.owned { background:#1a3300; color:#77ee77; }
+.throwable-anim { position:fixed; font-size:2.2rem; pointer-events:none; z-index:25; animation:throwArc 1.1s ease-in forwards; }
+@keyframes throwArc { 0%{transform:translate(0,0) rotate(0deg) scale(1);opacity:1;} 45%{transform:translate(var(--tx),var(--ty)) rotate(200deg) scale(1.3);opacity:1;} 100%{transform:translate(var(--tx2),var(--ty2)) rotate(400deg) scale(0.2);opacity:0;} }
 </style>
-
 </head>
 <body>
-
-<!-- TITLE SCREEN -->
+<canvas id="gameCanvas"></canvas>
 
 <div id="titleScreen" class="screen">
   <h1>🔥 Fireside Follies</h1>
@@ -129,1061 +63,677 @@ animation:throwArc 1.2s ease-in forwards;
   <button class="fire-btn secondary" onclick="startSolo()">🦆 Solo Roast</button>
 </div>
 
-<!-- LOBBY SCREEN -->
-
 <div id="lobbyScreen" class="screen hidden">
   <h2 id="lobbyTitle">Host a Fire 🔥</h2>
   <div class="lobby-box">
-    <div id="hostPanel">
-      <p style="color:#ffaa44;font-size:0.85rem;text-align:center;margin-bottom:8px;">Share this code with friends:</p>
-      <div class="code-display" id="hostCode">----</div>
-      <div id="playersList" class="players-list"></div>
-      <button class="fire-btn" id="startGameBtn" onclick="startGame()" style="width:100%;margin-top:10px;display:none;">
-        🔥 Start Roasting!
-      </button>
-    </div>
-    <div id="joinPanel" style="display:none;">
-      <input type="text" id="joinNameInput" placeholder="Your name (e.g. Dave)" maxlength="12">
-      <input type="text" id="joinCodeInput" placeholder="Enter host code" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;">
-      <button class="fire-btn" onclick="joinGame()" style="width:100%;margin-top:8px;">Join the Fire!</button>
-    </div>
-    <div id="hostNamePanel" style="display:none;">
-      <input type="text" id="hostNameInput" placeholder="Your name (e.g. Dave)" maxlength="12">
+    <div id="hostNamePanel">
+      <input type="text" id="hostNameInput" placeholder="Your name" maxlength="12">
       <button class="fire-btn" onclick="confirmHost()" style="width:100%;margin-top:8px;">Create Lobby</button>
     </div>
-    <p id="lobbyStatus">Connecting...</p>
+    <div id="hostPanel" style="display:none;">
+      <p style="color:#ffaa44;font-size:0.82rem;text-align:center;margin-bottom:6px;">Share this code:</p>
+      <div class="code-display" id="hostCode">----</div>
+      <div id="playersList" class="players-list"></div>
+      <button class="fire-btn" id="startGameBtn" onclick="startGame()" style="width:100%;margin-top:10px;display:none;">🔥 Start Roasting!</button>
+    </div>
+    <div id="joinPanel" style="display:none;">
+      <input type="text" id="joinNameInput" placeholder="Your name" maxlength="12">
+      <input type="text" id="joinCodeInput" placeholder="Host code" maxlength="6" style="text-transform:uppercase;letter-spacing:5px;">
+      <button class="fire-btn" onclick="joinGame()" style="width:100%;margin-top:8px;">Join the Fire!</button>
+    </div>
+    <p id="lobbyStatus"></p>
     <button class="fire-btn secondary" onclick="backToTitle()" style="width:100%;margin-top:8px;padding:10px;">← Back</button>
   </div>
 </div>
 
-<!-- HUD -->
-
-<div id="hud" class="hidden">
-  <div id="hudBar">
-    <div id="pointsDisplay">🔥 0 pts</div>
-    <button onclick="openShop()" style="background:#cc440088;border:1px solid #ff6600;border-radius:8px;padding:4px 12px;color:#ffcc66;font-size:0.85rem;pointer-events:all;cursor:pointer;">🛒 Shop</button>
-    <button onclick="toggleFood()" style="background:#004400aa;border:1px solid #44ff44;border-radius:8px;padding:4px 10px;color:#88ff88;font-size:0.8rem;pointer-events:all;cursor:pointer;" id="foodBtn">🍡 Food</button>
+<div id="topHud" class="hidden">
+  <div id="commentaryStrip">🔥 Welcome to Fireside Follies!</div>
+  <div id="hudRight">
+    <div id="pointsBadge">🔥 0 pts</div>
+    <button class="hud-btn" onclick="openShop()">🛒 Shop</button>
   </div>
 </div>
-
-<!-- COMMENTARY -->
-
-<div id="commentaryBox" class="hidden"></div>
-
-<!-- SHOP SCREEN -->
 
 <div id="shopScreen" class="screen hidden">
   <div class="shop-box">
     <h2>🛒 Fire Shop</h2>
-    <p style="text-align:center;color:#ffaa44;font-size:0.9rem;">Your points: <span id="shopPoints">0</span> 🔥</p>
-
-```
-<div class="shop-category">🍖 Food Items</div>
-<div id="shopFoodItems"></div>
-
-<div class="shop-category">🎨 Flame Colors</div>
-<div id="shopFlames"></div>
-
-<div class="shop-category">📏 Fire Size</div>
-<div id="shopFireSize"></div>
-
-<div class="shop-category">🪄 Stick Skins</div>
-<div id="shopSticks"></div>
-
-<div class="shop-category">💥 Throwables</div>
-<div id="shopThrowables"></div>
-
-<button class="fire-btn secondary" onclick="closeShop()" style="width:100%;margin-top:14px;">← Back to Fire</button>
-```
-
+    <p class="shop-pts">Points: <strong id="shopPoints">0</strong> 🔥</p>
+    <div class="shop-category">🍖 Unlock Food</div><div id="shopFoodItems"></div>
+    <div class="shop-category">🎨 Flame Color</div><div id="shopFlames"></div>
+    <div class="shop-category">📏 Fire Size</div><div id="shopFireSize"></div>
+    <div class="shop-category">🪄 Stick Skins</div><div id="shopSticks"></div>
+    <div class="shop-category">💥 Throwables</div><div id="shopThrowables"></div>
+    <button class="fire-btn secondary" onclick="closeShop()" style="width:100%;margin-top:14px;">← Back to Fire</button>
   </div>
 </div>
 
-<!-- COOK RESULT -->
-
-<div id="cookResult">
-  <div class="result-emoji" id="resultEmoji"></div>
-  <div class="result-level" id="resultLevel"></div>
-  <div class="result-comment" id="resultComment"></div>
-  <div class="result-points" id="resultPoints"></div>
-</div>
-
-<!-- GAME CANVAS -->
-
-<canvas id="gameCanvas"></canvas>
-
 <script>
-// ═══════════════════════════════════════════════════════════
-//  FIRESIDE FOLLIES — Engine
-// ═══════════════════════════════════════════════════════════
-
 const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+const ctx    = canvas.getContext('2d');
+const HUD_H  = 46;
 
 // ── State ──
-const state = {
-  running: false,
-  points: 0,
-  fireSize: 1.0,
-  flameColor: 'natural',
-  stickSkin: 'wood',
-  ownedItems: new Set(['marshmallow','hotdog','iguana']),
-  selectedFood: 'marshmallow',
-  cookProgress: 0,         // 0-100
-  cookStage: 0,            // 0=raw,1=rare,2=med-rare,3=medium,4=well,5=well-done,6=burnt
-  isOnFire: false,
-  stickX: 0, stickY: 0,   // will be set on resize
-  dragging: false,
-  fireY: 0,                // base y of fire
-  fireIntensity: 0,        // 0-1 based on stick proximity
-  particles: [],
-  sparks: [],
-  activeThrowable: null,
-  throwableTimer: 0,
-  flameShift: { r:255, g:140, b:30 },
-  players: [],             // multiplayer
-  isHost: false,
-  myName: 'Player',
-  peer: null,
-  connections: [],
-  soloMode: false,
+const S = {
+  running:false, points:0,
+  fireSize:1.0, flameColor:'natural', stickSkin:'wood',
+  selectedFood:'none', cookProgress:0, cookStage:0,
+  hasFoodOnStick:false, isOnFire:false, fireIntensity:0,
+  stickX:0, stickY:0, dragging:false,
+  particles:[], sparks:[],
+  throwableEffect:null, throwableTs:0,
+  peer:null, connections:[], players:[], isHost:false, myName:'Player', soloMode:false,
+  W:0, H:0, sandY:0, fireY:0,
+  foodStackX:0, foodStackBaseY:0,
+  tickAlpha:0, tickText:'', tickColor:'#ffcc66',
+  servedAlpha:0, servedEmoji:'', servedText:'',
 };
 
-const COOK_STAGES = ['Raw','Rare','Medium Rare','Medium','Well Done','Perfectly Done','💀 CREMATED'];
-
-const FOOD_DATA = {
-  marshmallow: {
-    emoji: ['⬜','🟡','🟠','🟤','🟫','🍥','⬛'],
-    name: 'Marshmallow',
-    comments: [
-      ["Still raw. Is this a snowball?","0 points. Cold marshmallow. COLD.","I've seen more effort from a sloth."],
-      ["Getting there! Like a tan on a cloud.","Slightly warm. Adorable.","Your marshmallow has seen the sun."],
-      ["Ooh toasty! The outer skin is crackling!","That golden color is *chef's kiss*.","Beautiful! You're a marshmallow whisperer."],
-      ["Golden perfection! You nailed it!","Magnificently gooey in the middle!","Award-winning! Museums will display this."],
-      ["Slightly overdone but I respect the commitment.","A little charred but still edible, champ.","Well done! Literally."],
-      ["PERFECT! The platonic ideal of roasted marshmallow!","The angels are weeping with joy!","Frame it. Eat it. Then weep."],
-      ["It's pure carbon. It's ART.","You've invented a new element.","That's not food, that's a warning."],
-    ],
-    points: [0,50,80,120,100,200,10],
-  },
-  hotdog: {
-    emoji: ['🌭','🟡','🟠','🟤','🟫','🍖','💀'],
-    name: 'Hot Dog',
-    comments: [
-      ["That's barely a warm frank. Embarrassing.","Dogs everywhere are confused.","Technically edible. Technically."],
-      ["Getting some color. Looking like a sausage now!","Barely cooked but hey, it's a start.","Pink inside. Like a sunburned tourist."],
-      ["Nice sizzle! The juices are flowing!","That's a proper hot dog! Snap when you bite it.","Grade A tube steak situation."],
-      ["CRISPY skin, juicy inside. PERFECTION!","That dog is DONE right!","A hot dog Michelangelo would eat."],
-      ["Getting a little leather-jacket vibe on it...","Chewy but committed. Respect.","It has the texture of a garden hose."],
-      ["PERFECT ROAST! You could open a cart in NYC!","Stunning. Museum-quality frankfurter.","This hot dog changed my life."],
-      ["It's a cinder. A sad little cinder.","Your hot dog has achieved enlightenment.","Ashes to ashes, dog to dust."],
-    ],
-    points: [0,45,75,110,95,190,10],
-  },
-  iguana: {
-    emoji: ['🦎','🟡','🟠','🟤','🟫','✨','💀'],
-    name: 'Iguana',
-    comments: [
+const FOOD = {
+  marshmallow:{ name:'Marshmallow', rawColor:'#f0f0f0', shape:'square',
+    stages:['⬜','🟡','🟠','🟤','🟫','🍥','⬛'],
+    comments:[
+      ["Still raw. Is this a snowball?","Cold marshmallow. COLD.","I've seen more effort from a sloth."],
+      ["Getting a tan! Like a cloud in Florida.","Your marshmallow visited the sun.","Slightly warm. Adorable."],
+      ["Toasty! The outer skin is crackling!","That golden color is *chef's kiss*.","You're a marshmallow whisperer."],
+      ["Golden perfection! You nailed it!","Magnificently gooey in the middle!","Museums will display this."],
+      ["Slightly overdone but I respect it.","Well done! Literally.","A little charred but still edible."],
+      ["PERFECT! Platonic ideal of roasted marshmallow!","The angels are weeping with joy!","Frame it. Eat it. Weep."],
+      ["Pure carbon. It's ART.","You invented a new element.","That's not food. That's a warning."],
+    ], pts:[0,50,80,120,100,200,10] },
+  hotdog:{ name:'Hot Dog', rawColor:'#e8a07a', shape:'rectangle',
+    stages:['🌭','🟡','🟠','🟤','🟫','🍖','💀'],
+    comments:[
+      ["That's barely a warm frank. Embarrassing.","Technically edible. Technically.","Dogs everywhere are confused."],
+      ["Getting some color! Looking like a sausage!","Pink inside. Like a sunburned tourist.","Barely cooked but hey, start."],
+      ["Nice sizzle! The juices are flowing!","Grade A tube steak situation.","That's a proper hot dog!"],
+      ["CRISPY skin, juicy inside. PERFECTION!","A hot dog Michelangelo would eat.","That dog is DONE right!"],
+      ["Getting leather-jacket vibes...","It has the texture of a garden hose.","Chewy but committed. Respect."],
+      ["PERFECT ROAST! Open a cart in NYC!","Museum-quality frankfurter.","This hot dog changed my life."],
+      ["It's a cinder. A sad little cinder.","Ashes to ashes, dog to dust.","Your hot dog achieved enlightenment."],
+    ], pts:[0,45,75,110,95,190,10] },
+  iguana:{ name:'Iguana', rawColor:'#5a9e5a', shape:'oval',
+    stages:['🦎','🟡','🟠','🟤','🟫','✨','💀'],
+    comments:[
       ["The iguana looks... confused.","Technically still blinking.","I think it waved at me."],
-      ["Getting warm! Still has personality though.","A gently warmed lizard. For the adventurous.","It smells like a hiking trail."],
-      ["Now we're cooking! Literally! Great sizzle!","It's turning a lovely terracotta.","Iguana cuisine is underrated. You're a pioneer."],
-      ["Beautifully roasted! Juicy and fragrant!","The iguana chef community salutes you!","Top-tier lizard. Gordon would be proud."],
-      ["A bit charred on the spiky bits.","Like jerky but with more dignity.","Crunchy. Very crunchy. Too crunchy."],
-      ["FLAWLESS iguana roast! The rarest achievement!","12/10. The lizard died for something beautiful.","This is a spiritual experience."],
-      ["It's... black. Everything is black.","The lizard has become the universe.","Its ghost will haunt this fire forever."],
-    ],
-    points: [0,60,90,140,110,250,15],
-  },
-  smore: {
-    emoji: ['🍪','🟡','🟠','🔶','🟤','⭐','💀'],
-    name: "S'more",
-    comments: [
+      ["Getting warm! Still has personality.","A gently warmed lizard. For the adventurous.","It smells like a hiking trail."],
+      ["Now we're cooking! Great sizzle!","Iguana cuisine is underrated. Pioneer.","It's turning a lovely terracotta."],
+      ["Beautifully roasted! Juicy and fragrant!","Top-tier lizard. Gordon would be proud.","The iguana chef community salutes you!"],
+      ["Charred on the spiky bits.","Too crunchy. WAY too crunchy.","Like jerky but with more dignity."],
+      ["FLAWLESS iguana roast! Rarest achievement!","12/10. It died for something beautiful.","This is a spiritual experience."],
+      ["It's black. Everything is black.","The lizard became the universe.","Its ghost haunts this fire forever."],
+    ], pts:[0,60,90,140,110,250,15] },
+  smore:{ name:"S'more", rawColor:'#c8a87a', shape:'square',
+    stages:['🍪','🟡','🟠','🔶','🟤','⭐','💀'],
+    comments:[
       ["Cold chocolate and raw marshmallow. Chaos.","Not a s'more. A cold sadness sandwich.","This is not camping. This is failure."],
       ["The chocolate is starting to melt! Promising!","Like a warm hug from a questionable friend.","Getting there. Maybe."],
-      ["Ooh! Gooey center forming! Yes!","The chocolate is MELTING. The marshmallow TOASTING.","This is becoming something beautiful."],
-      ["GOLDEN! GOOEY! GLORIOUS!","A s'more that Shakespeare would eat.","Everything I've ever wanted."],
-      ["Too far! The graham cracker is a weapon now.","Crunchy and sad. Like my camping memories.","This could cut glass."],
-      ["PERFECT S'MORE! The Holy Grail of campfire!","You've ascended. You are the s'more.","I'm crying. This is perfect."],
-      ["S'more? More like s'gone.","Carbon compound, graham cracker notes.","It has transcended snack."],
-    ],
-    points: [0,70,110,160,120,280,20],
-  },
+      ["Ooh! Gooey center forming! YES!","The chocolate MELTS. The marshmallow TOASTS.","This is becoming something beautiful."],
+      ["GOLDEN! GOOEY! GLORIOUS!","A s'more Shakespeare would eat.","Everything I have ever wanted."],
+      ["Too far! The graham cracker is a weapon!","This could cut glass.","Crunchy and sad."],
+      ["PERFECT S'MORE! Holy Grail of campfire!","I'm crying. This is perfect.","You ARE the s'more."],
+      ["S'more? More like s'gone.","It transcended snack.","Carbon compound, graham cracker notes."],
+    ], pts:[0,70,110,160,120,280,20] },
 };
 
-const SHOP_DATA = {
-  food: [
-    { id:'smore', icon:'🍪', name:"S'more (Unlock)", cost:300 },
-  ],
-  flames: [
-    { id:'blue',    icon:'🔵', name:'Blue Flame',    cost:150 },
-    { id:'green',   icon:'🟢', name:'Green Flame',   cost:150 },
-    { id:'purple',  icon:'🟣', name:'Purple Flame',  cost:150 },
-    { id:'rainbow', icon:'🌈', name:'Rainbow Flame', cost:400 },
-  ],
-  fireSize: [
-    { id:'size_big',   icon:'📈', name:'Bigger Fire (+25%)',  cost:200 },
-    { id:'size_huge',  icon:'🔥', name:'Massive Fire (+50%)', cost:450 },
-  ],
-  sticks: [
-    { id:'neon',    icon:'💡', name:'Neon Stick',    cost:100 },
-    { id:'diamond', icon:'💎', name:'Diamond Stick', cost:300 },
-    { id:'candy',   icon:'🍬', name:'Candy Cane Stick', cost:150 },
-  ],
-  throwables: [
-    { id:'fireworks', icon:'🎆', name:'Fireworks',      cost:80 },
-    { id:'duck',      icon:'🦆', name:'Rubber Duck',    cost:60 },
-    { id:'disco',     icon:'🪩', name:'Disco Ball',     cost:120 },
-    { id:'butter',    icon:'🧈', name:'Stick of Butter',cost:50 },
-    { id:'pinata',    icon:'🎊', name:'Piñata',         cost:90 },
-  ],
+const STAGES = ['Raw','Rare','Medium Rare','Medium','Well Done','Perfectly Done','CREMATED'];
+const STAGE_COLORS = ['#aaaaaa','#ff9966','#ff7733','#ee5500','#cc3300','#ffcc00','#444444'];
+
+const SHOP = {
+  food:[ {id:'smore',icon:'🍪',name:"S'more",cost:300} ],
+  flames:[ {id:'blue',icon:'🔵',name:'Blue Flame',cost:150},{id:'green',icon:'🟢',name:'Green Flame',cost:150},{id:'purple',icon:'🟣',name:'Purple Flame',cost:150},{id:'rainbow',icon:'🌈',name:'Rainbow Flame',cost:400} ],
+  fireSize:[ {id:'big',icon:'📈',name:'Bigger Fire +25%',cost:200},{id:'huge',icon:'🔥',name:'Massive Fire +50%',cost:450} ],
+  sticks:[ {id:'neon',icon:'💡',name:'Neon Stick',cost:100},{id:'diamond',icon:'💎',name:'Diamond Stick',cost:300},{id:'candy',icon:'🍬',name:'Candy Cane Stick',cost:150} ],
+  throwables:[ {id:'fireworks',icon:'🎆',name:'Fireworks',cost:80},{id:'duck',icon:'🦆',name:'Rubber Duck',cost:60},{id:'disco',icon:'🪩',name:'Disco Ball',cost:120},{id:'butter',icon:'🧈',name:'Stick of Butter',cost:50},{id:'pinata',icon:'🎊',name:'Pinata',cost:90} ],
 };
 
 const owned = {
-  flames: new Set(['natural']),
-  fireSize: new Set(),
-  sticks: new Set(['wood']),
-  throwables: new Set(),
-  food: new Set(['marshmallow','hotdog','iguana']),
+  flames:new Set(['natural']), fireSize:new Set(), sticks:new Set(['wood']),
+  throwables:new Set(), food:new Set(['marshmallow','hotdog','iguana']),
 };
 
-// ── Resize ──
-function resize() {
-  canvas.width = window.innerWidth;
+// ── Layout ──
+const FOOD_STACK_LIST = [
+  {key:'marshmallow', color:'#f0f0f0', border:'#bbbbbb'},
+  {key:'hotdog',      color:'#d87848', border:'#a04820'},
+  {key:'iguana',      color:'#4a9a50', border:'#2a6028'},
+  {key:'smore',       color:'#c49050', border:'#8a5822'},
+];
+const ITEM_W = 42, ITEM_H = 42, ITEM_GAP = 10;
+
+function resize(){
+  canvas.width  = window.innerWidth;
   canvas.height = window.innerHeight;
-  state.fireY = canvas.height * 0.72;
-  if (!state.dragging) {
-    state.stickX = canvas.width * 0.5;
-    state.stickY = state.fireY - 80;
+  S.W = canvas.width; S.H = canvas.height;
+  S.sandY  = Math.floor(S.H * 0.80);
+  S.fireY  = S.sandY;
+  S.foodStackX   = S.W - ITEM_W/2 - 8;
+  S.foodStackBaseY = HUD_H + 20;
+  if(!S.dragging){
+    S.stickX = S.W * 0.45;
+    S.stickY = S.fireY - 140 * S.fireSize;
   }
 }
 window.addEventListener('resize', resize);
 resize();
 
 // ── Particles ──
-function spawnParticle() {
-  const cx = canvas.width * 0.5;
-  const spread = 60 * state.fireSize;
-  state.particles.push({
-    x: cx + (Math.random()-0.5)*spread*2,
-    y: state.fireY,
-    vx: (Math.random()-0.5)*1.5,
-    vy: -(Math.random()*3+2) * state.fireSize,
-    life: 1,
-    decay: Math.random()*0.015+0.01,
-    size: Math.random()*28+8,
-    colorPhase: Math.random()*Math.PI*2,
+function spawnParticle(){
+  const cx=S.W/2, spread=60*S.fireSize;
+  S.particles.push({
+    x:cx+(Math.random()-0.5)*spread*2, y:S.fireY-5,
+    vx:(Math.random()-0.5)*2.2,
+    vy:-(Math.random()*4+2.5)*S.fireSize,
+    life:1, decay:Math.random()*0.012+0.008,
+    size:Math.random()*38+12, cp:Math.random()*Math.PI*2,
+  });
+}
+function spawnSpark(){
+  S.sparks.push({
+    x:S.W/2+(Math.random()-0.5)*55*S.fireSize, y:S.fireY-10,
+    vx:(Math.random()-0.5)*5, vy:-(Math.random()*7+3),
+    life:1, decay:Math.random()*0.02+0.012, size:Math.random()*3+1,
   });
 }
 
-function spawnSpark() {
-  const cx = canvas.width * 0.5;
-  state.sparks.push({
-    x: cx + (Math.random()-0.5)*40*state.fireSize,
-    y: state.fireY - 20,
-    vx: (Math.random()-0.5)*3,
-    vy: -(Math.random()*5+3),
-    life: 1,
-    decay: Math.random()*0.02+0.015,
-    size: Math.random()*3+1,
-  });
-}
-
-// ── Flame color ──
-const FLAME_COLORS = {
-  natural: [
-    {r:255,g:240,b:50,a:1},{r:255,g:160,b:20,a:0.9},
-    {r:220,g:80,b:10,a:0.7},{r:180,g:40,b:5,a:0.4},
-  ],
-  blue: [
-    {r:80,g:200,b:255,a:1},{r:40,g:100,b:220,a:0.9},
-    {r:20,g:60,b:180,a:0.7},{r:10,g:30,b:120,a:0.4},
-  ],
-  green: [
-    {r:100,g:255,b:80,a:1},{r:40,g:200,b:50,a:0.9},
-    {r:20,g:150,b:30,a:0.7},{r:10,g:80,b:20,a:0.4},
-  ],
-  purple: [
-    {r:220,g:80,b:255,a:1},{r:160,g:40,b:200,a:0.9},
-    {r:100,g:20,b:160,a:0.7},{r:60,g:10,b:100,a:0.4},
-  ],
+// ── Flame colour ──
+const FC={
+  natural:[[255,240,50,1],[255,160,20,0.9],[220,80,10,0.7],[180,40,5,0.35]],
+  blue:   [[80,200,255,1],[40,100,220,0.9],[20,60,180,0.7],[10,30,110,0.35]],
+  green:  [[100,255,80,1],[40,200,50,0.9],[20,150,30,0.7],[10,80,20,0.35]],
+  purple: [[220,80,255,1],[160,40,200,0.9],[100,20,160,0.7],[60,10,100,0.35]],
 };
-
-function getFlameColor(life, colorPhase) {
-  const fc = state.flameColor;
-  let colors;
-  if (fc === 'rainbow') {
-    const t = (Date.now()/800 + colorPhase) % (Math.PI*2);
-    const r = Math.floor(127+127*Math.sin(t));
-    const g = Math.floor(127+127*Math.sin(t+2.1));
-    const b = Math.floor(127+127*Math.sin(t+4.2));
-    return `rgba(${r},${g},${b},${life})`;
+function flameRGBA(life,cp,ts){
+  if(S.flameColor==='rainbow'){
+    const t=(ts/700+cp)%(Math.PI*2);
+    return `rgba(${~~(127+127*Math.sin(t))},${~~(127+127*Math.sin(t+2.1))},${~~(127+127*Math.sin(t+4.2))},${life})`;
   }
-  colors = FLAME_COLORS[fc] || FLAME_COLORS.natural;
-  const idx = Math.floor((1-life)*colors.length);
-  const c = colors[Math.min(idx, colors.length-1)];
-  return `rgba(${c.r},${c.g},${c.b},${c.a*life})`;
+  const cols=FC[S.flameColor]||FC.natural;
+  const c=cols[Math.min(~~((1-life)*cols.length),cols.length-1)];
+  return `rgba(${c[0]},${c[1]},${c[2]},${c[3]*life})`;
 }
 
-// ── Draw fire ──
-function drawFire(ts) {
-  const cx = canvas.width * 0.5;
-  const fy = state.fireY;
-  const fs = state.fireSize;
+// ── Draw functions ──
+function drawBg(){
+  const g=ctx.createRadialGradient(S.W/2,S.H*0.5,0,S.W/2,S.H*0.5,S.H);
+  g.addColorStop(0,'#1e0a00'); g.addColorStop(0.55,'#0a0400'); g.addColorStop(1,'#000');
+  ctx.fillStyle=g; ctx.fillRect(0,0,S.W,S.H);
+  // vignette
+  const v=ctx.createRadialGradient(S.W/2,S.H/2,S.H*0.18,S.W/2,S.H/2,S.H*0.88);
+  v.addColorStop(0,'rgba(0,0,0,0)'); v.addColorStop(1,'rgba(0,0,0,0.6)');
+  ctx.fillStyle=v; ctx.fillRect(0,0,S.W,S.H);
+}
 
-  // Logs
-  ctx.save();
-  ctx.shadowBlur = 20; ctx.shadowColor = '#ff4400';
-  const logColors = ['#4a2000','#3a1800','#5a2800'];
-  const logs = [
-    {x:cx-60*fs, y:fy+10, w:100*fs, h:18*fs, rot:-0.15, c:logColors[0]},
-    {x:cx+10*fs,  y:fy+8,  w:90*fs,  h:16*fs, rot:0.2,  c:logColors[1]},
-    {x:cx-40*fs, y:fy+20, w:120*fs, h:16*fs, rot:0.05, c:logColors[2]},
+function drawSand(){
+  const sy=S.sandY, sw=S.W, sh=S.H-sy;
+  // main sand
+  const g=ctx.createLinearGradient(0,sy,0,S.H);
+  g.addColorStop(0,'#8a6035'); g.addColorStop(0.25,'#7a5028'); g.addColorStop(1,'#3a1e08');
+  ctx.fillStyle=g; ctx.fillRect(0,sy,sw,sh);
+  // subtle texture pebbles
+  ctx.save(); ctx.globalAlpha=0.12;
+  for(let i=0;i<200;i++){
+    const tx=((i*97.3)%1)*sw;
+    const ty=sy+((i*53.7)%1)*sh;
+    ctx.fillStyle=i%2===0?'#d4a060':'#2a1005';
+    ctx.beginPath(); ctx.arc(tx,ty,(i%3)*0.8+0.4,0,Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+  // fire light on sand
+  const gl=ctx.createRadialGradient(S.W/2,sy,0,S.W/2,sy,200*S.fireSize);
+  gl.addColorStop(0,'rgba(255,110,0,0.3)'); gl.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=gl; ctx.fillRect(0,sy,sw,sh);
+  // dark edge where sand meets fire
+  const edge=ctx.createLinearGradient(0,sy,0,sy+22);
+  edge.addColorStop(0,'rgba(0,0,0,0.5)'); edge.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=edge; ctx.fillRect(0,sy,sw,22);
+}
+
+function drawLogs(ts){
+  const cx=S.W/2, fy=S.fireY, fs=S.fireSize;
+  const defs=[
+    {ox:-55,oy:5, w:105,h:16,rot:-0.15,c:'#4a2000'},
+    {ox:14, oy:4, w:90, h:15,rot:0.22, c:'#3a1800'},
+    {ox:-32,oy:13,w:118,h:15,rot:0.05, c:'#5a2c00'},
   ];
-  logs.forEach(l => {
-    ctx.save(); ctx.translate(l.x, l.y); ctx.rotate(l.rot);
-    ctx.fillStyle = l.c;
-    ctx.beginPath(); ctx.ellipse(0,0,l.w/2,l.h/2,0,0,Math.PI*2);
-    ctx.fill();
-    // Ember glow on logs
-    ctx.fillStyle = `rgba(255,80,0,${0.3+0.2*Math.sin(ts/300+l.rot)})`;
-    ctx.beginPath(); ctx.ellipse(0,2,l.w/2-4,l.h/2-2,0,0,Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-  });
-  ctx.restore();
-
-  // Ground glow
-  const grd = ctx.createRadialGradient(cx, fy+10, 0, cx, fy+10, 140*fs);
-  grd.addColorStop(0,'rgba(255,120,0,0.35)');
-  grd.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); ctx.ellipse(cx, fy+10, 140*fs, 40*fs, 0, 0, Math.PI*2);
-  ctx.fill();
-
-  // Spawn particles
-  const spawnRate = Math.floor(3 * fs);
-  for (let i=0;i<spawnRate;i++) spawnParticle();
-  if (Math.random()<0.3) spawnSpark();
-
-  // Draw particles
-  state.particles.forEach(p => {
+  defs.forEach(l=>{
     ctx.save();
-    ctx.globalAlpha = p.life;
-    const grd2 = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size);
-    grd2.addColorStop(0, getFlameColor(1, p.colorPhase));
-    grd2.addColorStop(0.5, getFlameColor(p.life*0.7, p.colorPhase));
-    grd2.addColorStop(1,'rgba(0,0,0,0)');
-    ctx.fillStyle = grd2;
-    ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-  });
-
-  // Draw sparks
-  state.sparks.forEach(s => {
-    ctx.save();
-    ctx.globalAlpha = s.life;
-    ctx.fillStyle = `rgb(255,${Math.floor(200*s.life)},50)`;
-    ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2);
-    ctx.fill();
+    ctx.translate(cx+l.ox*fs, fy+l.oy);
+    ctx.rotate(l.rot);
+    ctx.shadowBlur=18; ctx.shadowColor='#ff4400';
+    ctx.fillStyle=l.c;
+    ctx.beginPath(); ctx.ellipse(0,0,l.w*fs/2,l.h/2,0,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.fillStyle=`rgba(255,80,0,${0.25+0.12*Math.sin(ts/280+l.rot*5)})`;
+    ctx.beginPath(); ctx.ellipse(0,-1,l.w*fs/2-3,l.h/2-2,0,0,Math.PI*2); ctx.fill();
     ctx.restore();
   });
 }
 
-// ── Draw stick & food ──
-function drawStick(ts) {
-  const sx = state.stickX;
-  const sy = state.stickY;
-  const fy = state.fireY;
-  const skin = state.stickSkin;
-  const foodKey = state.selectedFood;
-  const stage = state.cookStage;
-  const foodEmoji = FOOD_DATA[foodKey]?.emoji[Math.min(stage,6)] || '?';
+function drawFire(ts){
+  const cx=S.W/2, fy=S.fireY, fs=S.fireSize;
+  // ground halo
+  const gr=ctx.createRadialGradient(cx,fy,0,cx,fy,170*fs);
+  gr.addColorStop(0,'rgba(255,120,0,0.3)'); gr.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=gr; ctx.beginPath(); ctx.ellipse(cx,fy,170*fs,40*fs,0,0,Math.PI*2); ctx.fill();
 
-  // Stick line
+  const rate=Math.max(2,~~(5*fs));
+  for(let i=0;i<rate;i++) spawnParticle();
+  if(Math.random()<0.3) spawnSpark();
+
+  S.particles.forEach(p=>{
+    ctx.save(); ctx.globalAlpha=p.life;
+    const g2=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.size);
+    g2.addColorStop(0,flameRGBA(1,p.cp,ts));
+    g2.addColorStop(0.5,flameRGBA(p.life*0.6,p.cp,ts));
+    g2.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=g2; ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  });
+  S.sparks.forEach(s=>{
+    ctx.save(); ctx.globalAlpha=s.life;
+    ctx.fillStyle=`rgb(255,${~~(200*s.life)},40)`;
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  });
+}
+
+// ── Food stack on right edge ──
+function drawFoodStack(){
+  let y=S.foodStackBaseY;
+  FOOD_STACK_LIST.forEach(fd=>{
+    if(!owned.food.has(fd.key)) return;
+    const x=S.foodStackX, hw=ITEM_W/2, hh=ITEM_H/2;
+    // glow if stick tip is close
+    const near=!S.hasFoodOnStick && Math.abs(S.stickX-x)<44 && Math.abs(S.stickY-y)<44;
+    ctx.save();
+    if(near){ ctx.shadowBlur=18; ctx.shadowColor='#ffdd66'; }
+    ctx.strokeStyle=fd.border; ctx.lineWidth=2;
+    ctx.fillStyle=fd.color;
+    rr(ctx,x-hw,y-hh,ITEM_W,ITEM_H,6); ctx.fill(); ctx.stroke();
+    // food name first char label
+    ctx.fillStyle='rgba(0,0,0,0.6)';
+    ctx.font=`bold 10px Georgia`; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(FOOD[fd.key].name.substring(0,4), x, y);
+    ctx.restore();
+    y+=ITEM_H+ITEM_GAP;
+  });
+}
+
+// ── Stick & food on stick ──
+function drawStick(ts){
+  const sx=S.stickX, sy=S.stickY;
+  const hx=S.W*0.92, hy=S.fireY+20;
+  const skin=S.stickSkin;
   ctx.save();
-  ctx.lineWidth = 5;
-  if (skin === 'neon') {
-    ctx.strokeStyle = '#00ffff';
-    ctx.shadowBlur = 15; ctx.shadowColor = '#00ffff';
-  } else if (skin === 'diamond') {
-    const dg = ctx.createLinearGradient(sx,sy,canvas.width*0.85,fy+30);
-    dg.addColorStop(0,'#aaeeff'); dg.addColorStop(0.5,'#ffffff'); dg.addColorStop(1,'#88ccff');
-    ctx.strokeStyle = dg;
-    ctx.shadowBlur = 10; ctx.shadowColor = '#aaeeff';
-  } else if (skin === 'candy') {
-    ctx.strokeStyle = ctx.createLinearGradient(sx,sy,canvas.width*0.85,fy+30);
-    const cg = ctx.createLinearGradient(sx,sy,canvas.width*0.85,fy+30);
-    cg.addColorStop(0,'#ff4444'); cg.addColorStop(0.33,'#ffffff');
-    cg.addColorStop(0.66,'#ff4444'); cg.addColorStop(1,'#ffffff');
-    ctx.strokeStyle = cg;
+  ctx.lineWidth=6; ctx.lineCap='round';
+  if(skin==='neon'){
+    ctx.strokeStyle='#00ffff'; ctx.shadowBlur=16; ctx.shadowColor='#00ffff';
+  } else if(skin==='diamond'){
+    const dg=ctx.createLinearGradient(sx,sy,hx,hy);
+    dg.addColorStop(0,'#aaf0ff'); dg.addColorStop(0.5,'#fff'); dg.addColorStop(1,'#88ccff');
+    ctx.strokeStyle=dg; ctx.shadowBlur=10; ctx.shadowColor='#aaeeff';
+  } else if(skin==='candy'){
+    const cg=ctx.createLinearGradient(sx,sy,hx,hy);
+    cg.addColorStop(0,'#ff3333'); cg.addColorStop(0.25,'#fff'); cg.addColorStop(0.5,'#ff3333'); cg.addColorStop(0.75,'#fff'); cg.addColorStop(1,'#ff3333');
+    ctx.strokeStyle=cg;
   } else {
-    ctx.strokeStyle = '#8B4513';
-    ctx.shadowBlur = 4; ctx.shadowColor = '#442200';
+    ctx.strokeStyle='#8B4513'; ctx.shadowBlur=4; ctx.shadowColor='#442200';
   }
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.moveTo(canvas.width*0.88, fy+30);
-  ctx.lineTo(sx, sy);
-  ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(hx,hy); ctx.lineTo(sx,sy); ctx.stroke();
   ctx.restore();
+  // tip
+  if(S.hasFoodOnStick) drawFoodOnStick(ts,sx,sy);
+  else { ctx.save(); ctx.fillStyle='#c8943a'; ctx.beginPath(); ctx.arc(sx,sy,5,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+}
 
-  // Food emoji
+function drawFoodOnStick(ts,sx,sy){
+  const fd=FOOD[S.selectedFood]; if(!fd) return;
+  const stage=Math.min(S.cookStage,6);
+  const sz=24+5*S.fireSize;
+  const bounce=S.isOnFire ? Math.sin(ts/65)*2.5 : 0;
   ctx.save();
-  const bounce = state.isOnFire ? Math.sin(ts/80)*3 : 0;
-  const scale = state.isOnFire ? 1+0.1*Math.sin(ts/60) : 1;
   ctx.translate(sx, sy+bounce);
-  ctx.scale(scale,scale);
-  ctx.font = `${36*state.fireSize*0.9}px serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
+  if(S.isOnFire){ ctx.shadowBlur=24; ctx.shadowColor='#ff4400'; }
+  const shade=cookShade(fd.rawColor, S.cookProgress/100);
+  ctx.strokeStyle='rgba(0,0,0,0.5)'; ctx.lineWidth=1.5;
+  ctx.fillStyle=shade;
 
-  // Glow if on fire
-  if (state.isOnFire) {
-    ctx.shadowBlur = 20; ctx.shadowColor = '#ff4400';
-  }
-  ctx.fillText(foodEmoji, 0, 0);
-
-  // Heat shimmer if close to fire
-  if (state.fireIntensity > 0.5) {
-    ctx.globalAlpha = (state.fireIntensity-0.5)*0.6;
-    ctx.fillStyle = `rgba(255,${Math.floor(150-state.fireIntensity*100)},0,1)`;
-    ctx.fillText(foodEmoji, Math.sin(ts/40)*2, 0);
+  if(fd.shape==='square'){
+    rr(ctx,-sz/2,-sz/2,sz,sz,5); ctx.fill(); ctx.stroke();
+    if(stage>=4){ ctx.strokeStyle='rgba(0,0,0,0.55)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(-sz*0.3,-sz*0.15); ctx.lineTo(sz*0.3,-sz*0.15); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-sz*0.3,sz*0.1); ctx.lineTo(sz*0.3,sz*0.1); ctx.stroke(); }
+    if(S.isOnFire){ ctx.globalAlpha=0.3+0.18*Math.sin(ts/50); ctx.fillStyle='rgba(255,120,0,0.6)'; rr(ctx,-sz/2,-sz/2,sz,sz,5); ctx.fill(); }
+  } else if(fd.shape==='rectangle'){
+    rr(ctx,-sz*0.75,-sz*0.3,sz*1.5,sz*0.6,6); ctx.fill(); ctx.stroke();
+    if(stage>=3){ ctx.strokeStyle='rgba(0,0,0,0.4)'; ctx.lineWidth=1.5; [-0.28,0,0.28].forEach(o=>{ ctx.beginPath(); ctx.moveTo(o*sz,-sz*0.3); ctx.lineTo(o*sz,sz*0.3); ctx.stroke(); }); }
+    if(S.isOnFire){ ctx.globalAlpha=0.28+0.15*Math.sin(ts/50); ctx.fillStyle='rgba(255,120,0,0.5)'; rr(ctx,-sz*0.75,-sz*0.3,sz*1.5,sz*0.6,6); ctx.fill(); }
+  } else {
+    ctx.beginPath(); ctx.ellipse(0,0,sz*0.65,sz*0.38,0,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    if(stage>=3){ ctx.strokeStyle='rgba(0,0,0,0.35)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(-sz*0.35,0); ctx.lineTo(sz*0.35,0); ctx.stroke(); }
+    if(S.isOnFire){ ctx.globalAlpha=0.28+0.15*Math.sin(ts/50); ctx.fillStyle='rgba(255,140,0,0.45)'; ctx.beginPath(); ctx.ellipse(0,0,sz*0.65,sz*0.38,0,0,Math.PI*2); ctx.fill(); }
   }
   ctx.restore();
-
-  // Cook progress bar
-  if (state.running) {
-    const bw = 120, bh = 10;
-    const bx = sx - bw/2, by = sy - 36;
-    ctx.fillStyle = '#00000088';
-    ctx.beginPath(); ctx.roundRect(bx,by,bw,bh,5); ctx.fill();
-    const prog = state.cookProgress/100;
-    const barColor = prog < 0.5 ? `hsl(${prog*180},100%,50%)` : `hsl(${(1-prog)*120},100%,50%)`;
-    ctx.fillStyle = barColor;
-    ctx.beginPath(); ctx.roundRect(bx,by,bw*prog,bh,5); ctx.fill();
-
-    // Stage label
-    ctx.fillStyle = '#ffeecc';
-    ctx.font = '11px Georgia';
-    ctx.textAlign = 'center';
-    ctx.fillText(COOK_STAGES[Math.min(stage,6)], sx, by-6);
+  // cook bar — anchored above the food item
+  if(S.running){
+    const bw=84, bh=7, bx=sx-bw/2, by=sy-sz-26;
+    ctx.save(); ctx.globalAlpha=0.85;
+    ctx.fillStyle='#00000077'; rr(ctx,bx,by,bw,bh,4); ctx.fill();
+    ctx.fillStyle=STAGE_COLORS[stage]; rr(ctx,bx,by,bw*(S.cookProgress/100),bh,4); ctx.fill();
+    ctx.restore();
   }
 }
 
-// ── Background ──
-function drawBackground() {
-  const w = canvas.width, h = canvas.height;
-  // Dark room gradient
-  const bg = ctx.createRadialGradient(w*0.5, h*0.7, 0, w*0.5, h*0.5, h);
-  bg.addColorStop(0,'#1a0800');
-  bg.addColorStop(0.5,'#0a0400');
-  bg.addColorStop(1,'#000000');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0,0,w,h);
-
-  // TV screen vignette
-  const vig = ctx.createRadialGradient(w/2,h/2,h*0.2,w/2,h/2,h*0.85);
-  vig.addColorStop(0,'rgba(0,0,0,0)');
-  vig.addColorStop(1,'rgba(0,0,0,0.7)');
-  ctx.fillStyle = vig;
-  ctx.fillRect(0,0,w,h);
-
-  // Floor
-  const floor = ctx.createLinearGradient(0, state.fireY+20, 0, h);
-  floor.addColorStop(0,'#1a0800');
-  floor.addColorStop(1,'#000000');
-  ctx.fillStyle = floor;
-  ctx.fillRect(0, state.fireY+20, w, h);
+function cookShade(hex,t){
+  const r0=parseInt(hex.slice(1,3),16), g0=parseInt(hex.slice(3,5),16), b0=parseInt(hex.slice(5,7),16);
+  const r=~~(r0+(30-r0)*Math.min(1,t*1.1)), g=~~(g0+(18-g0)*Math.min(1,t*1.1)), b=~~(b0+(5-b0)*Math.min(1,t*1.1));
+  return `rgb(${r},${g},${b})`;
 }
 
-// ── Update physics ──
-function updatePhysics(ts) {
-  // Update particles
-  state.particles.forEach(p => {
-    p.x += p.vx + Math.sin(ts/500+p.y/50)*0.5;
-    p.y += p.vy;
-    p.vy *= 0.98;
-    p.life -= p.decay;
-    p.size *= 0.99;
-  });
-  state.particles = state.particles.filter(p => p.life > 0);
+function rr(c,x,y,w,h,r){
+  c.beginPath(); c.moveTo(x+r,y); c.lineTo(x+w-r,y); c.quadraticCurveTo(x+w,y,x+w,y+r); c.lineTo(x+w,y+h-r); c.quadraticCurveTo(x+w,y+h,x+w-r,y+h); c.lineTo(x+r,y+h); c.quadraticCurveTo(x,y+h,x,y+h-r); c.lineTo(x,y+r); c.quadraticCurveTo(x,y,x+r,y); c.closePath();
+}
 
-  state.sparks.forEach(s => {
-    s.x += s.vx; s.y += s.vy;
-    s.vy += 0.15; // gravity
-    s.life -= s.decay;
-  });
-  state.sparks = state.sparks.filter(s => s.life > 0);
+// ── HUD on canvas ──
+function drawHudCanvas(ts){
+  // tick (stage change) fades out
+  if(S.tickAlpha>0){
+    ctx.save(); ctx.globalAlpha=Math.min(1,S.tickAlpha);
+    ctx.font=`bold ${clamp(13,S.W*0.038,20)}px Georgia`;
+    ctx.textAlign='left'; ctx.textBaseline='middle';
+    ctx.fillStyle=S.tickColor; ctx.shadowBlur=10; ctx.shadowColor='#000';
+    ctx.fillText(S.tickText, 14, HUD_H+16);
+    ctx.restore();
+  }
+  // served food flash (lower mid area, above sand)
+  if(S.servedAlpha>0){
+    ctx.save(); ctx.globalAlpha=Math.min(1,S.servedAlpha);
+    ctx.font=`bold ${clamp(18,S.W*0.045,30)}px Georgia`;
+    ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle='#ffdd88'; ctx.shadowBlur=18; ctx.shadowColor='#000';
+    ctx.fillText(S.servedEmoji+'  '+S.servedText, S.W/2, S.sandY-52);
+    ctx.restore();
+  }
+}
 
-  // Cook logic
-  if (state.running) {
-    const dist = state.stickY - (state.fireY - 40*state.fireSize);
-    // fireIntensity: 1 = in fire, 0 = far away
-    state.fireIntensity = Math.max(0, 1 - dist/(120*state.fireSize));
-    state.isOnFire = state.fireIntensity > 0.9;
+// ── Throwable effects ──
+function drawThrowable(ts){
+  if(!S.throwableEffect) return;
+  const age=ts-S.throwableTs;
+  if(age>3500){ S.throwableEffect=null; return; }
+  const prog=age/3500, id=S.throwableEffect;
+  if(id==='fireworks'){
+    if(Math.random()<0.45) for(let i=0;i<5;i++) S.sparks.push({x:S.W*(0.15+Math.random()*0.7),y:S.fireY-40-Math.random()*170,vx:(Math.random()-0.5)*9,vy:-(Math.random()*8+2),life:1,decay:0.02,size:Math.random()*5+2});
+  } else if(id==='disco'){
+    ctx.save(); ctx.globalAlpha=(1-prog)*0.5;
+    for(let i=0;i<10;i++){ const a=(i/10)*Math.PI*2+ts/380; const rd=75+22*Math.sin(ts/160); ctx.fillStyle=`hsl(${i*36+ts/8},100%,58%)`; ctx.beginPath(); ctx.arc(S.W/2+Math.cos(a)*rd,S.fireY-55+Math.sin(a)*rd*0.38,11,0,Math.PI*2); ctx.fill(); }
+    ctx.restore();
+  } else if(id==='duck'){
+    ctx.save(); ctx.globalAlpha=1-prog;
+    ctx.font=`${~~((1-prog)*70+14)}px serif`; ctx.textAlign='center';
+    ctx.fillText('🦆',S.W/2,S.fireY-75-prog*110);
+    ctx.restore();
+  } else if(id==='pinata'){
+    ctx.save(); const candy=['🍬','🍭','🍡','🍩','🍪'];
+    for(let i=0;i<6;i++){ const cx2=S.W*(0.08+0.84*((i*0.18+prog*0.65)%1)); const cy2=(S.fireY-200)+prog*240+i*28; ctx.globalAlpha=Math.max(0,1-prog*1.7+0.15); ctx.font='22px serif'; ctx.textAlign='center'; ctx.fillText(candy[i%candy.length],cx2,cy2%S.H); }
+    ctx.restore();
+  }
+}
 
-    if (state.fireIntensity > 0.05) {
-      const rate = state.fireIntensity * 0.08;
-      state.cookProgress = Math.min(100, state.cookProgress + rate);
-      state.cookStage = Math.floor(state.cookProgress / (100/6));
-    }
+// ── Physics ──
+let lastStage=-1;
+function updatePhysics(ts,dt){
+  S.particles.forEach(p=>{ p.x+=p.vx+Math.sin(ts/470+p.y/55)*0.6; p.y+=p.vy; p.vy*=0.986; p.life-=p.decay; p.size*=0.994; });
+  S.particles=S.particles.filter(p=>p.life>0);
+  S.sparks.forEach(s=>{ s.x+=s.vx; s.y+=s.vy; s.vy+=0.18; s.life-=s.decay; });
+  S.sparks=S.sparks.filter(s=>s.life>0);
+  if(S.tickAlpha>0) S.tickAlpha-=dt*0.0007;
+  if(S.servedAlpha>0) S.servedAlpha-=dt*0.00055;
 
-    if (state.cookProgress >= 100 && state.cookStage < 6) {
-      state.cookStage = 6; // burnt
+  if(!S.running||!S.hasFoodOnStick) { S.isOnFire=false; S.fireIntensity=0; return; }
+
+  // butter boost
+  let butterBoost=0;
+  if(S.throwableEffect==='butter'){ const age=ts-S.throwableTs; if(age<3500) butterBoost=0.5*(1-age/3500); }
+
+  const fireTop=S.fireY-(200+butterBoost*90)*S.fireSize;
+  const dist=S.stickY-fireTop;
+  S.fireIntensity=Math.max(0, 1-dist/(180*S.fireSize));
+  S.isOnFire=S.fireIntensity>0.88;
+
+  if(S.fireIntensity>0.03){
+    S.cookProgress=Math.min(100, S.cookProgress+S.fireIntensity*0.065);
+    const ns=Math.min(6,~~(S.cookProgress/(100/6)));
+    if(ns!==S.cookStage){
+      S.cookStage=ns;
+      if(ns!==lastStage){
+        showTick(STAGES[ns], STAGE_COLORS[ns]);
+        doCommentary();
+        lastStage=ns;
+      }
     }
   }
 }
+
+function showTick(text,color){ S.tickText=text; S.tickColor=color||'#ffcc66'; S.tickAlpha=2.8; }
 
 // ── Commentary ──
-const commentaryEl = document.getElementById('commentaryBox');
-let lastCommentTime = 0;
-const COMMENT_INTERVAL = 6000;
+const commentEl=document.getElementById('commentaryStrip');
+let lastComTs=0;
+function doCommentary(){
+  const fd=FOOD[S.selectedFood]; if(!fd) return;
+  const idx=Math.min(S.cookStage,6);
+  const lines=fd.comments[idx];
+  const line=lines[~~(Math.random()*lines.length)];
+  commentEl.textContent='💬 "'+line+'"';
+  if(window.speechSynthesis){ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(line); u.rate=1.1; u.pitch=1.15; u.volume=0.55; speechSynthesis.speak(u); }
+  lastComTs=performance.now();
+}
+function tickCommentary(ts){
+  if(!S.running) return;
+  if(ts-lastComTs>8000 && S.hasFoodOnStick) doCommentary();
+}
 
-function updateCommentary(ts) {
-  if (!state.running) return;
-  if (ts - lastCommentTime < COMMENT_INTERVAL) return;
-  lastCommentTime = ts;
+// ── Audio ──
+let audioCtx=null;
+function initAudio(){
+  if(audioCtx) return;
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  playFireNoise(); schedCrackle();
+}
+function playFireNoise(){
+  const len=audioCtx.sampleRate*2, buf=audioCtx.createBuffer(1,len,audioCtx.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*0.1;
+  const src=audioCtx.createBufferSource(); src.buffer=buf; src.loop=true;
+  const f=audioCtx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=380;
+  const g=audioCtx.createGain(); g.gain.value=0.28;
+  src.connect(f); f.connect(g); g.connect(audioCtx.destination); src.start();
+}
+function schedCrackle(){ setTimeout(()=>{playCrackle();schedCrackle();},900+Math.random()*2400); }
+function playCrackle(){
+  if(!audioCtx) return;
+  const dur=0.07+Math.random()*0.1, buf=audioCtx.createBuffer(1,~~(audioCtx.sampleRate*dur),audioCtx.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.exp(-i/d.length*9);
+  const src=audioCtx.createBufferSource(); src.buffer=buf;
+  const g=audioCtx.createGain(); g.gain.value=0.4+Math.random()*0.4;
+  src.connect(g); g.connect(audioCtx.destination); src.start();
+}
+function playSizzle(){
+  if(!audioCtx) return;
+  const buf=audioCtx.createBuffer(1,~~(audioCtx.sampleRate*0.3),audioCtx.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.exp(-i/d.length*2.2)*0.25;
+  const src=audioCtx.createBufferSource(); src.buffer=buf;
+  const f=audioCtx.createBiquadFilter(); f.type='highpass'; f.frequency.value=1100;
+  const g=audioCtx.createGain(); g.gain.value=0.6;
+  src.connect(f); f.connect(g); g.connect(audioCtx.destination); src.start();
+}
 
-  const food = FOOD_DATA[state.selectedFood];
-  if (!food) return;
-  const stageIdx = Math.min(state.cookStage, 6);
-  const comments = food.comments[stageIdx];
-  const line = comments[Math.floor(Math.random()*comments.length)];
-  commentaryEl.textContent = `💬 "${line}"`;
-
-  // TTS
-  if (window.speechSynthesis) {
-    window.speechSynthesis.cancel();
-    const utt = new SpeechSynthesisUtterance(line);
-    utt.rate = 1.1; utt.pitch = 1.1; utt.volume = 0.6;
-    window.speechSynthesis.speak(utt);
+// ── Pickup ──
+function tryPickup(tx,ty){
+  let y=S.foodStackBaseY;
+  for(const fd of FOOD_STACK_LIST){
+    if(!owned.food.has(fd.key)){y+=ITEM_H+ITEM_GAP;continue;}
+    if(Math.abs(tx-S.foodStackX)<ITEM_W*0.85 && Math.abs(ty-y)<ITEM_H*0.85){
+      S.selectedFood=fd.key; S.hasFoodOnStick=true;
+      S.cookProgress=0; S.cookStage=0; lastStage=-1;
+      showTick(FOOD[fd.key].name+' on stick!','#ffcc66');
+      commentEl.textContent='💬 "A fresh '+FOOD[fd.key].name+'! Hold it over the fire... carefully."';
+      return true;
+    }
+    y+=ITEM_H+ITEM_GAP;
   }
+  return false;
 }
 
-// ── WebAudio ──
-let audioCtx = null;
-let fireBufferNode = null;
-let crackleInterval = null;
-
-function initAudio() {
-  if (audioCtx) return;
-  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-  playFireLoop();
-  crackleInterval = setInterval(playCrackle, 1800+Math.random()*2000);
+// ── Serve ──
+function serveFood(){
+  if(!S.hasFoodOnStick||S.cookProgress<5) return;
+  const fd=FOOD[S.selectedFood]; if(!fd) return;
+  const stage=Math.min(S.cookStage,6), pts=fd.pts[stage];
+  S.points+=pts;
+  document.getElementById('pointsBadge').textContent='🔥 '+S.points+' pts';
+  S.servedEmoji=fd.stages[stage]; S.servedText=STAGES[stage]+'! +'+pts+' pts'; S.servedAlpha=3.2;
+  const line=fd.comments[stage][~~(Math.random()*fd.comments[stage].length)];
+  commentEl.textContent='💬 "'+line+'"';
+  if(window.speechSynthesis){ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(line); u.rate=1.1; u.pitch=1.2; speechSynthesis.speak(u); }
+  S.hasFoodOnStick=false; S.selectedFood='none'; S.cookProgress=0; S.cookStage=0; lastStage=-1;
 }
 
-function playFireLoop() {
-  const bufLen = audioCtx.sampleRate * 2;
-  const buf = audioCtx.createBuffer(1, bufLen, audioCtx.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i=0;i<bufLen;i++) data[i] = (Math.random()*2-1)*0.12;
-  const src = audioCtx.createBufferSource();
-  src.buffer = buf; src.loop = true;
-  const filt = audioCtx.createBiquadFilter();
-  filt.type = 'lowpass'; filt.frequency.value = 400;
-  const gain = audioCtx.createGain(); gain.gain.value = 0.35;
-  src.connect(filt); filt.connect(gain); gain.connect(audioCtx.destination);
-  src.start();
-}
-
-function playCrackle() {
-  if (!audioCtx) return;
-  const dur = 0.08+Math.random()*0.12;
-  const buf = audioCtx.createBuffer(1, audioCtx.sampleRate*dur, audioCtx.sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i=0;i<d.length;i++) d[i] = (Math.random()*2-1) * Math.exp(-i/d.length*8);
-  const src = audioCtx.createBufferSource();
-  src.buffer = buf;
-  const gain = audioCtx.createGain(); gain.gain.value = 0.5+Math.random()*0.4;
-  src.connect(gain); gain.connect(audioCtx.destination);
-  src.start();
-  crackleInterval = setTimeout(playCrackle, 800+Math.random()*2500);
-}
-
-function playSizzle() {
-  if (!audioCtx) return;
-  const dur = 0.4;
-  const buf = audioCtx.createBuffer(1, audioCtx.sampleRate*dur, audioCtx.sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i=0;i<d.length;i++) d[i] = (Math.random()*2-1) * Math.exp(-i/(d.length)*3) * 0.3;
-  const src = audioCtx.createBufferSource();
-  src.buffer = buf;
-  const f = audioCtx.createBiquadFilter(); f.type='highpass'; f.frequency.value=1200;
-  const g = audioCtx.createGain(); g.gain.value=0.7;
-  src.connect(f); f.connect(g); g.connect(audioCtx.destination);
-  src.start();
-}
+// ── Input ──
+canvas.addEventListener('touchstart',e=>{
+  e.preventDefault(); initAudio();
+  const t=e.touches[0];
+  if(!S.hasFoodOnStick && S.running && tryPickup(t.clientX,t.clientY)) return;
+  S.dragging=true; S.stickX=t.clientX; S.stickY=t.clientY;
+},{passive:false});
+canvas.addEventListener('touchmove',e=>{
+  e.preventDefault(); if(!S.dragging) return;
+  const t=e.touches[0]; S.stickX=t.clientX; S.stickY=Math.min(t.clientY,S.sandY+12);
+},{passive:false});
+canvas.addEventListener('touchend',e=>{
+  e.preventDefault(); S.dragging=false;
+  if(S.hasFoodOnStick && S.cookProgress>=5) serveFood();
+},{passive:false});
+canvas.addEventListener('mousedown',e=>{
+  initAudio();
+  if(!S.hasFoodOnStick && S.running && tryPickup(e.clientX,e.clientY)) return;
+  S.dragging=true; S.stickX=e.clientX; S.stickY=e.clientY;
+});
+canvas.addEventListener('mousemove',e=>{ if(!S.dragging) return; S.stickX=e.clientX; S.stickY=Math.min(e.clientY,S.sandY+12); });
+canvas.addEventListener('mouseup',()=>{ S.dragging=false; if(S.hasFoodOnStick && S.cookProgress>=5) serveFood(); });
 
 // ── Main loop ──
-let lastTs = 0;
-let lastStage = 0;
-
-function loop(ts) {
-  if (!state.running) { requestAnimationFrame(loop); return; }
-  const dt = ts - lastTs; lastTs = ts;
-
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  drawBackground();
+let prevTs=0;
+function loop(ts){
+  const dt=Math.min(ts-prevTs,80); prevTs=ts;
+  ctx.clearRect(0,0,S.W,S.H);
+  drawBg();
   drawFire(ts);
-  drawStick(ts);
-  drawThrowableEffect(ts);
-  updatePhysics(ts);
-  updateCommentary(ts);
-
-  // Sizzle when food near fire
-  if (state.fireIntensity > 0.3 && Math.random() < 0.02) playSizzle();
-
-  // Stage change notification
-  if (state.cookStage !== lastStage) {
-    if (state.cookStage > 0) showCookResult(false);
-    lastStage = state.cookStage;
+  drawLogs(ts);
+  drawSand();
+  if(S.running){
+    drawFoodStack();
+    drawStick(ts);
+    drawThrowable(ts);
+    drawHudCanvas(ts);
+    updatePhysics(ts,dt);
+    tickCommentary(ts);
+    if(S.isOnFire && Math.random()<0.024) playSizzle();
   }
-
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
 
-// ── Touch controls ──
-canvas.addEventListener('touchstart', e => {
-  e.preventDefault();
-  initAudio();
-  const t = e.touches[0];
-  state.dragging = true;
-  state.stickX = t.clientX;
-  state.stickY = t.clientY;
-}, {passive:false});
-
-canvas.addEventListener('touchmove', e => {
-  e.preventDefault();
-  if (!state.dragging) return;
-  const t = e.touches[0];
-  state.stickX = t.clientX;
-  state.stickY = Math.min(t.clientY, state.fireY + 20);
-}, {passive:false});
-
-canvas.addEventListener('touchend', e => {
-  e.preventDefault();
-  state.dragging = false;
-  // If they lift out, auto-serve
-  if (state.cookProgress > 15) showCookResult(true);
-}, {passive:false});
-
-canvas.addEventListener('mousedown', e => {
-  initAudio();
-  state.dragging = true;
-  state.stickX = e.clientX;
-  state.stickY = e.clientY;
-});
-canvas.addEventListener('mousemove', e => {
-  if (!state.dragging) return;
-  state.stickX = e.clientX;
-  state.stickY = Math.min(e.clientY, state.fireY+20);
-});
-canvas.addEventListener('mouseup', () => {
-  state.dragging = false;
-  if (state.cookProgress > 15) showCookResult(true);
-});
-
-// ── Cook result popup ──
-function showCookResult(final) {
-  const food = FOOD_DATA[state.selectedFood];
-  if (!food) return;
-  const stageIdx = Math.min(state.cookStage, 6);
-  const emoji = food.emoji[stageIdx];
-  const level = COOK_STAGES[stageIdx];
-  const comments = food.comments[stageIdx];
-  const comment = comments[Math.floor(Math.random()*comments.length)];
-  const pts = food.points[stageIdx];
-
-  document.getElementById('resultEmoji').textContent = emoji + ' ' + emoji;
-  document.getElementById('resultLevel').textContent = level + '!';
-  document.getElementById('resultComment').textContent = '"' + comment + '"';
-
-  if (final) {
-    state.points += pts;
-    document.getElementById('resultPoints').textContent = '+' + pts + ' points! (Total: ' + state.points + ')';
-    document.getElementById('pointsDisplay').textContent = '🔥 ' + state.points + ' pts';
-    // Reset
-    setTimeout(() => {
-      state.cookProgress = 0;
-      state.cookStage = 0;
-      lastStage = 0;
-      hideCookResult();
-    }, 2800);
-  } else {
-    document.getElementById('resultPoints').textContent = COOK_STAGES[stageIdx];
-    setTimeout(hideCookResult, 1200);
-  }
-
-  document.getElementById('cookResult').classList.add('show');
-}
-
-function hideCookResult() {
-  document.getElementById('cookResult').classList.remove('show');
-}
-
-// ── Throwable effects ──
-let throwableEffect = null;
-let throwableTs = 0;
-
-function drawThrowableEffect(ts) {
-  if (!throwableEffect) return;
-  const age = ts - throwableTs;
-  if (age > 3000) { throwableEffect = null; return; }
-
-  const t = throwableEffect;
-  const prog = age/3000;
-
-  if (t.id === 'fireworks') {
-    // Extra sparks burst
-    if (Math.random()<0.4) {
-      for (let i=0;i<3;i++) {
-        state.sparks.push({
-          x: canvas.width*0.3+Math.random()*canvas.width*0.4,
-          y: state.fireY-50-Math.random()*100,
-          vx: (Math.random()-0.5)*6,
-          vy: -(Math.random()*6+2),
-          life:1, decay:0.02, size: Math.random()*4+2
-        });
-      }
-    }
-  } else if (t.id === 'disco') {
-    // Rainbow circles
-    ctx.save();
-    ctx.globalAlpha = (1-prog)*0.4;
-    for (let i=0;i<8;i++) {
-      const a = (i/8)*Math.PI*2 + ts/500;
-      const r = 60+30*Math.sin(ts/200);
-      const cx2 = canvas.width*0.5 + Math.cos(a)*r;
-      const cy2 = state.fireY - 40 + Math.sin(a)*r*0.5;
-      ctx.fillStyle = `hsl(${i*45+ts/10},100%,60%)`;
-      ctx.beginPath(); ctx.arc(cx2,cy2,10,0,Math.PI*2); ctx.fill();
-    }
-    ctx.restore();
-  } else if (t.id === 'butter') {
-    // Giant flare — make fire temporarily bigger
-    state.fireSize = Math.min(2.5, state.fireSize + 0.5*(1-prog));
-  } else if (t.id === 'duck') {
-    // Melting duck emoji flying
-    ctx.save();
-    ctx.globalAlpha = 1-prog;
-    ctx.font = `${(1-prog)*60+10}px serif`;
-    ctx.textAlign='center';
-    ctx.fillText('🦆', canvas.width*0.5, state.fireY-60-prog*80);
-    ctx.restore();
-  } else if (t.id === 'pinata') {
-    // Candy rain
-    ctx.save();
-    const candies = ['🍬','🍭','🍡','🍩','🍪'];
-    for (let i=0;i<5;i++) {
-      const cx2 = canvas.width*(0.1+0.8*((i+prog*3)%1));
-      const cy2 = (state.fireY-200) + prog*250 + i*30;
-      ctx.globalAlpha = Math.max(0,1-prog*2+0.3);
-      ctx.font='24px serif'; ctx.textAlign='center';
-      ctx.fillText(candies[i%candies.length], cx2, cy2%(canvas.height));
-    }
-    ctx.restore();
-  }
-}
-
-function throwItem(id) {
-  throwableEffect = { id };
-  throwableTs = performance.now();
-  const emoji = SHOP_DATA.throwables.find(t=>t.id===id)?.icon||'💥';
-  const div = document.createElement('div');
-  div.className='throwable-anim';
-  div.textContent = emoji;
-  div.style.left = '10px';
-  div.style.top = canvas.height*0.5+'px';
-  div.style.setProperty('--tx', (canvas.width*0.3)+'px');
-  div.style.setProperty('--ty', (-canvas.height*0.3)+'px');
-  div.style.setProperty('--tx2', (canvas.width*0.45)+'px');
-  div.style.setProperty('--ty2', (-canvas.height*0.5)+'px');
-  document.body.appendChild(div);
-  setTimeout(()=>div.remove(), 1300);
-  playSizzle();
-
-  const commentary = {
-    fireworks:["KABOOM! The fire goes full 4th of July!","WHOA! Sparks! Everywhere! OH NO MY EYEBROWS!"],
-    duck:["A DUCK? You threw a DUCK in the fire?!","Gary the Duck has... moved on.","The quacking has stopped. Forever."],
-    disco:["SATURDAY NIGHT FEEEEEVER!","The fire is now a DISCO! Dance, flames, DANCE!","John Travolta is somewhere smiling."],
-    butter:["GREASE FIRE! OH NO. OH YES. OH NO.","The fire is now 40% butter. 100% dangerous.","Gordon Ramsay just fainted."],
-    pinata:["CANDY RAIN! The fire approves!","Is... is that a jawbreaker landing in the hotdog?","Best. Party. EVER."],
-  };
-  const lines = commentary[id]||["CHAOS REIGNS!"];
-  const line = lines[Math.floor(Math.random()*lines.length)];
-  commentaryEl.textContent = '💬 "' + line + '"';
-  if (window.speechSynthesis) {
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(line);
-    u.rate=1.2; u.pitch=1.3; window.speechSynthesis.speak(u);
-  }
-}
-
 // ── Shop ──
-function openShop() {
-  document.getElementById('shopScreen').classList.remove('hidden');
+function openShop(){ document.getElementById('shopScreen').classList.remove('hidden'); renderShop(); }
+function closeShop(){ document.getElementById('shopScreen').classList.add('hidden'); }
+function renderShop(){
+  document.getElementById('shopPoints').textContent=S.points;
+  const row=(item,cat,action,isOwned,active,canAfford)=>`<div class="shop-item"><div class="shop-item-info"><span class="shop-item-icon">${item.icon}</span><span>${item.name}<span class="shop-item-cost"> ${item.cost} pts</span></span></div><button class="buy-btn${isOwned?' owned':''}" onclick="${action}" ${(!isOwned&&!canAfford)?'disabled':''}>${isOwned?(active?'▶ Active':cat==='throwables'?'🔥 Throw!':'Use'):'Buy'}</button></div>`;
+  document.getElementById('shopFoodItems').innerHTML=SHOP.food.map(i=>row(i,'food',`buyItem('food','${i.id}',${i.cost})`,owned.food.has(i.id),false,S.points>=i.cost)).join('');
+  document.getElementById('shopFlames').innerHTML=SHOP.flames.map(i=>row(i,'flames',owned.flames.has(i.id)?`setFlame('${i.id}')`:`buyItem('flames','${i.id}',${i.cost})`,owned.flames.has(i.id),S.flameColor===i.id,S.points>=i.cost)).join('');
+  document.getElementById('shopFireSize').innerHTML=SHOP.fireSize.map(i=>row(i,'fireSize',`buyItem('fireSize','${i.id}',${i.cost})`,owned.fireSize.has(i.id),false,S.points>=i.cost)).join('');
+  document.getElementById('shopSticks').innerHTML=SHOP.sticks.map(i=>row(i,'sticks',owned.sticks.has(i.id)?`setStick('${i.id}')`:`buyItem('sticks','${i.id}',${i.cost})`,owned.sticks.has(i.id),S.stickSkin===i.id,S.points>=i.cost)).join('');
+  document.getElementById('shopThrowables').innerHTML=SHOP.throwables.map(i=>row(i,'throwables',owned.throwables.has(i.id)?`throwItem('${i.id}');closeShop()`:`buyItem('throwables','${i.id}',${i.cost})`,owned.throwables.has(i.id),false,S.points>=i.cost)).join('');
+}
+function buyItem(cat,id,cost){
+  if(S.points<cost) return; S.points-=cost;
+  document.getElementById('pointsBadge').textContent='🔥 '+S.points+' pts';
+  owned[cat].add(id);
+  if(cat==='food') owned.food.add(id);
+  if(cat==='flames') setFlame(id);
+  if(cat==='fireSize'){ if(id==='big') S.fireSize=1.25; if(id==='huge') S.fireSize=1.5; }
+  if(cat==='sticks') setStick(id);
   renderShop();
 }
-function closeShop() {
-  document.getElementById('shopScreen').classList.add('hidden');
+function setFlame(id){ S.flameColor=id; closeShop(); }
+function setStick(id){ S.stickSkin=id; closeShop(); }
+
+// ── Throwables ──
+const THROW_LINES={fireworks:["KABOOM! 4th of July in the living room!","Sparks EVERYWHERE! My eyebrows!"],duck:["A DUCK?! Gary the Duck has... moved on.","The quacking has stopped. Forever."],disco:["SATURDAY NIGHT FEEEEEVER! Dance, flames!","John Travolta is somewhere smiling."],butter:["GREASE FIRE! 40% butter now!","Gordon Ramsay just fainted."],pinata:["CANDY RAIN! The fire APPROVES!","Is that a jawbreaker in my hotdog?! YES."]};
+function throwItem(id){
+  S.throwableEffect=id; S.throwableTs=performance.now();
+  const def=SHOP.throwables.find(t=>t.id===id);
+  const div=document.createElement('div'); div.className='throwable-anim'; div.textContent=def?.icon||'💥';
+  div.style.left='20px'; div.style.top=(S.H*0.5)+'px';
+  div.style.setProperty('--tx',(S.W*0.25)+'px'); div.style.setProperty('--ty',(-S.H*0.3)+'px');
+  div.style.setProperty('--tx2',(S.W*0.44)+'px'); div.style.setProperty('--ty2',(-S.H*0.55)+'px');
+  document.body.appendChild(div); setTimeout(()=>div.remove(),1200);
+  const lines=THROW_LINES[id]||['CHAOS!']; const line=lines[~~(Math.random()*lines.length)];
+  commentEl.textContent='💬 "'+line+'"';
+  if(window.speechSynthesis){ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(line); u.rate=1.2; u.pitch=1.3; speechSynthesis.speak(u); }
+  playSizzle();
 }
 
-function renderShop() {
-  document.getElementById('shopPoints').textContent = state.points;
-
-  // Food
-  let foodHTML = '';
-  SHOP_DATA.food.forEach(item => {
-    const isOwned = owned.food.has(item.id);
-    const canAfford = state.points >= item.cost;
-    foodHTML += `<div class="shop-item">
-      <div class="shop-item-info"><span class="shop-item-icon">${item.icon}</span><span>${item.name}<br><span class="shop-item-cost">${item.cost} pts</span></span></div>
-      <button class="buy-btn${isOwned?' owned':''}" onclick="buyItem('food','${item.id}',${item.cost})" ${isOwned?'disabled':(!canAfford?'disabled':'')}>
-        ${isOwned?'✓ Owned':'Buy'}
-      </button></div>`;
-  });
-  document.getElementById('shopFoodItems').innerHTML = foodHTML;
-
-  // Flames
-  let flameHTML = '';
-  SHOP_DATA.flames.forEach(item => {
-    const isOwned = owned.flames.has(item.id);
-    const isActive = state.flameColor === item.id;
-    const canAfford = state.points >= item.cost;
-    flameHTML += `<div class="shop-item">
-      <div class="shop-item-info"><span class="shop-item-icon">${item.icon}</span><span>${item.name}<br><span class="shop-item-cost">${item.cost} pts</span></span></div>
-      <button class="buy-btn${isOwned?' owned':''}" onclick="${isOwned?`setFlame('${item.id}')`:`buyItem('flames','${item.id}',${item.cost})`}" ${!isOwned&&!canAfford?'disabled':''}>
-        ${isOwned?(isActive?'▶ Active':'Use'):'Buy'}
-      </button></div>`;
-  });
-  document.getElementById('shopFlames').innerHTML = flameHTML;
-
-  // Fire size
-  let sizeHTML = '';
-  SHOP_DATA.fireSize.forEach(item => {
-    const isOwned = owned.fireSize.has(item.id);
-    const canAfford = state.points >= item.cost;
-    sizeHTML += `<div class="shop-item">
-      <div class="shop-item-info"><span class="shop-item-icon">${item.icon}</span><span>${item.name}<br><span class="shop-item-cost">${item.cost} pts</span></span></div>
-      <button class="buy-btn${isOwned?' owned':''}" onclick="buyItem('fireSize','${item.id}',${item.cost})" ${isOwned?'disabled':(!canAfford?'disabled':'')}>
-        ${isOwned?'✓ Active':'Buy'}
-      </button></div>`;
-  });
-  document.getElementById('shopFireSize').innerHTML = sizeHTML;
-
-  // Sticks
-  let stickHTML = '';
-  SHOP_DATA.sticks.forEach(item => {
-    const isOwned = owned.sticks.has(item.id);
-    const isActive = state.stickSkin === item.id;
-    const canAfford = state.points >= item.cost;
-    stickHTML += `<div class="shop-item">
-      <div class="shop-item-info"><span class="shop-item-icon">${item.icon}</span><span>${item.name}<br><span class="shop-item-cost">${item.cost} pts</span></span></div>
-      <button class="buy-btn${isOwned?' owned':''}" onclick="${isOwned?`setStick('${item.id}')`:`buyItem('sticks','${item.id}',${item.cost})`}" ${!isOwned&&!canAfford?'disabled':''}>
-        ${isOwned?(isActive?'▶ Active':'Use'):'Buy'}
-      </button></div>`;
-  });
-  document.getElementById('shopSticks').innerHTML = stickHTML;
-
-  // Throwables
-  let throwHTML = '';
-  SHOP_DATA.throwables.forEach(item => {
-    const isOwned = owned.throwables.has(item.id);
-    const canAfford = state.points >= item.cost;
-    throwHTML += `<div class="shop-item">
-      <div class="shop-item-info"><span class="shop-item-icon">${item.icon}</span><span>${item.name}<br><span class="shop-item-cost">${item.cost} pts</span></span></div>
-      <button class="buy-btn${isOwned?' owned':''}" onclick="${isOwned?`throwItem('${item.id}');closeShop()`:`buyItem('throwables','${item.id}',${item.cost})`}" ${!isOwned&&!canAfford?'disabled':''}>
-        ${isOwned?'🔥 Throw!':'Buy'}
-      </button></div>`;
-  });
-  document.getElementById('shopThrowables').innerHTML = throwHTML;
-}
-
-function buyItem(category, id, cost) {
-  if (state.points < cost) return;
-  state.points -= cost;
-  document.getElementById('pointsDisplay').textContent = '🔥 ' + state.points + ' pts';
-  owned[category].add(id);
-
-  // Auto-apply
-  if (category === 'food') { owned.food.add(id); state.selectedFood = id; }
-  if (category === 'flames') setFlame(id);
-  if (category === 'fireSize') {
-    if (id === 'size_big') state.fireSize = 1.25;
-    if (id === 'size_huge') state.fireSize = 1.5;
-  }
-  if (category === 'sticks') setStick(id);
-  renderShop();
-}
-
-function setFlame(id) {
-  state.flameColor = id;
-  closeShop();
-}
-function setStick(id) {
-  state.stickSkin = id;
-  closeShop();
-}
-
-// ── Food toggle ──
-const FOOD_ORDER = ['marshmallow','hotdog','iguana','smore'];
-function toggleFood() {
-  const available = FOOD_ORDER.filter(f => owned.food.has(f));
-  const idx = available.indexOf(state.selectedFood);
-  state.selectedFood = available[(idx+1)%available.length];
-  state.cookProgress = 0; state.cookStage = 0; lastStage = 0;
-  const icons = {marshmallow:'🍡',hotdog:'🌭',iguana:'🦎',smore:'🍪'};
-  document.getElementById('foodBtn').textContent = (icons[state.selectedFood]||'🍡') + ' Food';
-  commentaryEl.textContent = `💬 "New round! ${FOOD_DATA[state.selectedFood]?.name} it is!"`;
-}
-
-// ── Multiplayer (PeerJS) ──
-let peerReady = false;
-
-function loadPeerJS(cb) {
-  if (window.Peer) { cb(); return; }
-  const s = document.createElement('script');
-  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js';
-  s.onload = cb; document.head.appendChild(s);
-}
-
-function showLobby(mode) {
+// ── Multiplayer ──
+function showLobby(mode){
   document.getElementById('titleScreen').classList.add('hidden');
   document.getElementById('lobbyScreen').classList.remove('hidden');
-  document.getElementById('lobbyTitle').textContent = mode === 'host' ? 'Host a Fire 🔥' : 'Join a Fire 🔥';
-  document.getElementById('hostPanel').style.display = 'none';
-  document.getElementById('joinPanel').style.display = 'none';
-  document.getElementById('hostNamePanel').style.display = 'none';
-  document.getElementById('lobbyStatus').textContent = 'Loading...';
-
-  if (mode === 'host') {
-    document.getElementById('hostNamePanel').style.display = 'block';
-    state.isHost = true;
-  } else {
-    document.getElementById('joinPanel').style.display = 'block';
-  }
+  document.getElementById('lobbyTitle').textContent=mode==='host'?'Host a Fire 🔥':'Join a Fire 🔥';
+  document.getElementById('hostNamePanel').style.display=mode==='host'?'block':'none';
+  document.getElementById('joinPanel').style.display=mode==='join'?'block':'none';
+  document.getElementById('hostPanel').style.display='none';
+  document.getElementById('lobbyStatus').textContent=''; S.isHost=mode==='host';
 }
-
-function confirmHost() {
-  const name = document.getElementById('hostNameInput').value.trim() || 'Host';
-  state.myName = name;
-  document.getElementById('hostNamePanel').style.display = 'none';
-  document.getElementById('hostPanel').style.display = 'block';
-  document.getElementById('lobbyStatus').textContent = 'Connecting to server...';
-  loadPeerJS(() => setupHostPeer());
+function backToTitle(){ document.getElementById('lobbyScreen').classList.add('hidden'); document.getElementById('titleScreen').classList.remove('hidden'); if(S.peer){S.peer.destroy();S.peer=null;} S.connections=[];S.players=[]; }
+function confirmHost(){
+  const name=document.getElementById('hostNameInput').value.trim()||'Host'; S.myName=name;
+  document.getElementById('hostNamePanel').style.display='none'; document.getElementById('hostPanel').style.display='block';
+  document.getElementById('lobbyStatus').textContent='Connecting...'; loadPeer(()=>setupHost());
 }
-
-function setupHostPeer() {
-  const code = Math.random().toString(36).substr(2,5).toUpperCase();
-  const peer = new Peer('ff-' + code, { debug: 0 });
-  state.peer = peer;
-
-  peer.on('open', () => {
-    document.getElementById('hostCode').textContent = code;
-    document.getElementById('lobbyStatus').textContent = 'Waiting for players...';
-    state.players = [{ name: state.myName, id: 'host' }];
-    renderPlayerList();
-    document.getElementById('startGameBtn').style.display = 'block';
-  });
-
-  peer.on('connection', conn => {
-    state.connections.push(conn);
-    conn.on('data', data => {
-      if (data.type === 'join') {
-        state.players.push({ name: data.name, id: conn.peer });
-        renderPlayerList();
-        broadcast({ type: 'players', players: state.players });
-        document.getElementById('lobbyStatus').textContent = state.players.length + '/4 players';
-      }
-    });
-    conn.on('close', () => {
-      state.connections = state.connections.filter(c => c !== conn);
-      state.players = state.players.filter(p => p.id !== conn.peer);
-      renderPlayerList();
-    });
-  });
-
-  peer.on('error', err => {
-    document.getElementById('lobbyStatus').textContent = 'Error: ' + err.type + ' — try again';
-  });
+function loadPeer(cb){ if(window.Peer){cb();return;} const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js'; s.onload=cb; document.head.appendChild(s); }
+function setupHost(){
+  const code=Math.random().toString(36).substr(2,5).toUpperCase(); const peer=new Peer('ff-'+code,{debug:0}); S.peer=peer;
+  peer.on('open',()=>{ document.getElementById('hostCode').textContent=code; document.getElementById('lobbyStatus').textContent='Waiting for players...'; S.players=[{name:S.myName,id:'host'}]; renderList(); document.getElementById('startGameBtn').style.display='block'; });
+  peer.on('connection',conn=>{ S.connections.push(conn); conn.on('data',d=>{ if(d.type==='join'){S.players.push({name:d.name,id:conn.peer});renderList();broadcast({type:'players',players:S.players});document.getElementById('lobbyStatus').textContent=S.players.length+'/4 players';} }); conn.on('close',()=>{S.connections=S.connections.filter(c=>c!==conn);S.players=S.players.filter(p=>p.id!==conn.peer);renderList();}); });
+  peer.on('error',e=>{ document.getElementById('lobbyStatus').textContent='Error: '+e.type; });
 }
-
-function joinGame() {
-  const name = document.getElementById('joinNameInput').value.trim() || 'Guest';
-  const code = document.getElementById('joinCodeInput').value.trim().toUpperCase();
-  state.myName = name;
-  if (!code) { document.getElementById('lobbyStatus').textContent = 'Enter a code!'; return; }
-  document.getElementById('lobbyStatus').textContent = 'Connecting...';
-  loadPeerJS(() => {
-    const peer = new Peer({ debug: 0 });
-    state.peer = peer;
-    peer.on('open', () => {
-      const conn = peer.connect('ff-' + code);
-      conn.on('open', () => {
-        conn.send({ type: 'join', name });
-        document.getElementById('lobbyStatus').textContent = 'Connected! Waiting for host...';
-      });
-      conn.on('data', data => {
-        if (data.type === 'players') { state.players = data.players; renderPlayerList(); }
-        if (data.type === 'start') { startGame(); }
-      });
-      conn.on('error', () => { document.getElementById('lobbyStatus').textContent = 'Connection failed.'; });
-    });
-  });
+function joinGame(){
+  const name=document.getElementById('joinNameInput').value.trim()||'Guest'; const code=document.getElementById('joinCodeInput').value.trim().toUpperCase(); S.myName=name;
+  if(!code){document.getElementById('lobbyStatus').textContent='Enter a code!';return;}
+  document.getElementById('lobbyStatus').textContent='Connecting...';
+  loadPeer(()=>{ const peer=new Peer({debug:0}); S.peer=peer; peer.on('open',()=>{ const conn=peer.connect('ff-'+code); conn.on('open',()=>{conn.send({type:'join',name});document.getElementById('lobbyStatus').textContent='Connected! Waiting...';});conn.on('data',d=>{if(d.type==='players'){S.players=d.players;renderList();}if(d.type==='start')startGame();}); }); });
 }
+function broadcast(d){ S.connections.forEach(c=>{try{c.send(d);}catch(e){}}); }
+function renderList(){ let h=''; for(let i=0;i<4;i++){const p=S.players[i];h+=`<div class="player-slot"><div class="player-dot${p?'':' empty'}"></div>${p?p.name:'Waiting...'}</div>`;} document.getElementById('playersList').innerHTML=h; }
 
-function broadcast(data) {
-  state.connections.forEach(c => { try { c.send(data); } catch(e){} });
-}
-
-function renderPlayerList() {
-  const list = document.getElementById('playersList');
-  let html = '';
-  for (let i=0;i<4;i++) {
-    const p = state.players[i];
-    html += `<div class="player-slot"><div class="player-dot${p?'':' empty'}"></div>${p ? p.name : 'Waiting...'}</div>`;
-  }
-  list.innerHTML = html;
-}
-
-function startGame() {
-  if (state.isHost) broadcast({ type: 'start' });
+function startGame(){
+  if(S.isHost) broadcast({type:'start'});
   document.getElementById('lobbyScreen').classList.add('hidden');
-  document.getElementById('hud').classList.remove('hidden');
-  document.getElementById('commentaryBox').classList.remove('hidden');
-  state.running = true;
-  state.cookProgress = 0;
-  state.cookStage = 0;
-  lastStage = 0;
-  state.stickX = canvas.width * 0.5;
-  state.stickY = state.fireY - 100;
-  commentaryEl.textContent = '💬 "Welcome to Fireside Follies! Hold your stick over the fire... if you dare."';
+  document.getElementById('topHud').classList.remove('hidden');
+  S.running=true; S.cookProgress=0; S.cookStage=0; lastStage=-1;
+  S.hasFoodOnStick=false; S.selectedFood='none';
+  resize(); initAudio();
+  commentEl.textContent='💬 "Grab a food item from the right side and hold it over the fire!"';
 }
-
-function startSolo() {
-  state.soloMode = true;
-  state.myName = 'Solo Roaster';
-  state.players = [{ name: 'Solo Roaster', id: 'solo' }];
+function startSolo(){
+  S.soloMode=true; S.myName='Solo Roaster'; S.players=[{name:'Solo Roaster',id:'solo'}];
   document.getElementById('titleScreen').classList.add('hidden');
-  document.getElementById('hud').classList.remove('hidden');
-  document.getElementById('commentaryBox').classList.remove('hidden');
-  state.running = true;
-  state.cookProgress = 0; state.cookStage = 0; lastStage = 0;
-  state.stickX = canvas.width * 0.5;
-  state.stickY = state.fireY - 100;
-  initAudio();
-  commentaryEl.textContent = '💬 "Solo roasting! The most dignified way to cook a marshmallow."';
+  document.getElementById('topHud').classList.remove('hidden');
+  S.running=true; S.cookProgress=0; S.cookStage=0; lastStage=-1;
+  S.hasFoodOnStick=false; S.selectedFood='none';
+  resize(); initAudio();
+  commentEl.textContent='💬 "Tap a food item on the right, then drag it over that fire!"';
 }
 
-function backToTitle() {
-  document.getElementById('lobbyScreen').classList.add('hidden');
-  document.getElementById('titleScreen').classList.remove('hidden');
-  if (state.peer) { state.peer.destroy(); state.peer = null; }
-  state.connections = [];
-  state.players = [];
-}
+function clamp(a,v,b){ return Math.max(a,Math.min(b,v)); }
 </script>
 
 </body>
