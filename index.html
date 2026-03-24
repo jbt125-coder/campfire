@@ -257,6 +257,7 @@ const ST = {
   // crackling
   audioCtx: null,
   crackTimer: 0,
+  cricketTimer: 4000,
 };
 
 // ── Flame colour palettes ──
@@ -408,6 +409,28 @@ function playThunder(){
   const f=ac.createBiquadFilter(); f.type='lowpass'; f.frequency.value=200;
   const g=ac.createGain(); g.gain.value=0.7;
   src.connect(f); f.connect(g); g.connect(ac.destination); src.start();
+}
+
+// ── Cricket chirp synthesis ──
+function playCricket(){
+  if(!ST.audioCtx) return;
+  const ac = ST.audioCtx;
+  // A cricket chirp = rapid series of short high-freq pulses
+  const chirpCount = 3 + ~~(Math.random()*3);
+  for(let i=0;i<chirpCount;i++){
+    const t = ac.currentTime + i*0.065;
+    const dur = 0.04;
+    const buf = ac.createBuffer(1, ~~(ac.sampleRate*dur), ac.sampleRate);
+    const d = buf.getChannelData(0);
+    const freq = 3800 + Math.random()*600; // ~4kHz cricket freq
+    for(let j=0;j<d.length;j++){
+      const env = Math.sin(j/d.length*Math.PI); // bell envelope
+      d[j] = Math.sin(j/ac.sampleRate*freq*Math.PI*2)*env*0.18;
+    }
+    const src = ac.createBufferSource(); src.buffer = buf;
+    const g = ac.createGain(); g.gain.value = 0.35 + Math.random()*0.2;
+    src.connect(g); g.connect(ac.destination); src.start(t);
+  }
 }
 
 // ── Fire centres: 1 in portrait, 3 in landscape ──
@@ -740,7 +763,7 @@ function drawMoonEvent(ts, mx, my, mr){
 
   if(ev==='witch'){
     const wy = my - mr*0.55 + Math.sin(ts/700)*5;
-    const dir = prog < 0.5 ? 1 : -1; // face direction of travel
+    const dir = 1; // always faces direction of travel (left to right)
     const fade = Math.min(1, Math.min(prog, 1-prog)*8); // fade at edges
     ctx.save();
     ctx.globalAlpha = fade;
@@ -1035,6 +1058,10 @@ function update(ts, dt){
   ST.crackTimer-=dt;
   if(ST.crackTimer<=0){ playCrackle(); ST.crackTimer=800+Math.random()*2200; }
 
+  // Crickets — quiet ambient chirps every few seconds
+  ST.cricketTimer-=dt;
+  if(ST.cricketTimer<=0){ playCricket(); ST.cricketTimer=3500+Math.random()*6000; }
+
   // Stars twinkle (just update phase)
   // (drawn with current ts)
 
@@ -1204,10 +1231,7 @@ function openMenu(){
 function closeMenu(){
   menuOpen = false;
   document.getElementById('modeMenu').classList.remove('open');
-  if(ST.flameMode!=='ai'){
-    clearTimeout(hintTimer);
-    hintTimer=setTimeout(()=>document.getElementById('tapHint').classList.remove('hidden'),3000);
-  }
+  // hint will reappear on next tap via resetInteractionTimer
 }
 function enterScreensaver(){
   closeMenu();
@@ -1244,11 +1268,7 @@ function openPanel(){
 function closePanel(){
   panelOpen=false;
   document.getElementById('colorPanel').classList.remove('open');
-  // only bring hint back if NOT in AI mode
-  if(ST.flameMode!=='ai'){
-    clearTimeout(hintTimer);
-    hintTimer=setTimeout(()=>document.getElementById('tapHint').classList.remove('hidden'),3000);
-  }
+  // hint stays hidden — reappears on next tap
 }
 
 canvas.addEventListener('touchstart',e=>{
@@ -1286,7 +1306,22 @@ document.getElementById('colorPanel').addEventListener('touchstart',e=>e.stopPro
 document.getElementById('colorPanel').addEventListener('mousedown',e=>e.stopPropagation());
 
 // init hint hide after 5s
-setTimeout(()=>document.getElementById('tapHint').classList.remove('hidden'),100);
+// Show hint briefly, then auto-hide after 10s of no touch
+let lastInteraction = performance.now();
+function resetInteractionTimer(){
+  lastInteraction = performance.now();
+  // show hint immediately on interaction
+  if(typeof hintTimer!=='undefined') clearTimeout(hintTimer);
+  if(!GM.active && ST.flameMode!=='ai'){
+    document.getElementById('tapHint').classList.remove('hidden');
+    hintTimer=setTimeout(()=>document.getElementById('tapHint').classList.add('hidden'),3000);
+  }
+}
+// Initial: show hint for 4s then hide it — if no touch for 10s keep hidden
+setTimeout(()=>{
+  document.getElementById('tapHint').classList.remove('hidden');
+  hintTimer=setTimeout(()=>document.getElementById('tapHint').classList.add('hidden'),4000);
+},300);
 
 // ════════════════════════════════════════════════════════════
 //  GAME MODE ENGINE
@@ -1358,11 +1393,7 @@ function exitGame(){
   GM.active = false;
   document.getElementById('gameOverlay').classList.remove('active');
   GM.players.forEach(p=>{ p.hasFoodOnStick=false; p.cookProgress=0; p.cookStage=0; p.lastStage=-1; });
-  // restore hint
-  if(ST.flameMode!=='ai'){
-    clearTimeout(hintTimer);
-    hintTimer=setTimeout(()=>document.getElementById('tapHint').classList.remove('hidden'),3000);
-  }
+  // hint reappears on next tap
 }
 
 function resetGamePlayers(){
